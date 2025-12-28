@@ -16,7 +16,7 @@ const ManageMenu = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/products');
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
             const data = await res.json();
             setProducts(data);
         } catch (err) {
@@ -42,7 +42,7 @@ const ManageMenu = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this item?')) return;
         try {
-            await fetch(`http://localhost:5000/api/products/${id}`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
                 method: 'DELETE',
                 headers: { 'x-user-id': user.id } // Mocking auth header
             });
@@ -56,8 +56,8 @@ const ManageMenu = () => {
         e.preventDefault();
         setLoading(true);
         const url = editingProduct
-            ? `http://localhost:5000/api/products/${editingProduct._id}`
-            : 'http://localhost:5000/api/products';
+            ? `${import.meta.env.VITE_API_URL}/api/products/${editingProduct._id}`
+            : `${import.meta.env.VITE_API_URL}/api/products`;
 
         const method = editingProduct ? 'PUT' : 'POST';
 

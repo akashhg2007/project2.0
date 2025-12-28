@@ -10,7 +10,7 @@ const KitchenView = () => {
     const fetchOrders = async () => {
         try {
             // In a real app, use auth token. Here we use header for prototyping
-            const res = await fetch('http://localhost:5000/api/orders/staff/active', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/staff/active`, {
                 headers: { 'x-user-id': user.id }
             });
             if (res.ok) {
@@ -30,7 +30,7 @@ const KitchenView = () => {
 
     const updateStatus = async (orderId, newStatus) => {
         try {
-            await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${orderId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
