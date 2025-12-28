@@ -1,7 +1,4 @@
 {
-    "buildCommand": "cd campus-bites && npm install && npm run build",
-    "outputDirectory": "campus-bites/dist",
-    "installCommand": "cd campus-bites && npm install",
     "rewrites": [
         {
             "source": "/(.*)",
