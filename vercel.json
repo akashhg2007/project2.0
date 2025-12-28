@@ -1,8 +1,7 @@
 {
-    "buildCommand": "npm install && npm run build",
-    "outputDirectory": "dist",
-    "installCommand": "npm install",
-    "framework": "vite",
+    "buildCommand": "cd campus-bites && npm install && npm run build",
+    "outputDirectory": "campus-bites/dist",
+    "installCommand": "cd campus-bites && npm install",
     "rewrites": [
         {
             "source": "/(.*)",
