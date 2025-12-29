@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { UtensilsCrossed, Mail, Lock, ArrowRight } from 'lucide-react'
+import { UtensilsCrossed, Mail, Lock, ArrowRight, Sparkles, ChefHat } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -52,18 +52,31 @@ const Login = () => {
             overflow: 'hidden',
             color: 'white'
         }}>
-            {/* Dark Mode Background Elements */}
+            {/* Animated Background */}
             <style>{`
                 @keyframes float {
                     0%, 100% { transform: translateY(0px) rotate(0deg); }
                     50% { transform: translateY(-20px) rotate(5deg); }
                 }
+                @keyframes pulse {
+                    0%, 100% { opacity: 0.3; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(1.05); }
+                }
+                @keyframes shimmer {
+                    0% { background-position: -1000px 0; }
+                    100% { background-position: 1000px 0; }
+                }
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
                 .floating-emoji {
                     position: absolute;
                     font-size: 4rem;
-                    opacity: 0.2;
-                    filter: blur(4px);
+                    opacity: 0.15;
+                    filter: blur(2px);
                     pointer-events: none;
+                    animation: float 6s ease-in-out infinite;
                 }
                 .glass-card {
                     background: rgba(28, 28, 30, 0.6);
@@ -71,6 +84,7 @@ const Login = () => {
                     border-radius: 2rem;
                     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
                     border: 1px solid rgba(255, 255, 255, 0.1);
+                    animation: slideIn 0.6s ease-out;
                 }
                 .input-modern {
                     width: 100%;
@@ -86,6 +100,10 @@ const Login = () => {
                     outline: none;
                     border-color: #E23744;
                     background: rgba(226, 55, 68, 0.05);
+                    box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.1);
+                }
+                .input-modern::placeholder {
+                    color: #6B7280;
                 }
                 .btn-modern {
                     width: 100%;
@@ -98,15 +116,33 @@ const Login = () => {
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.3s ease;
-                    box-shadow: 0 10px 30px rgba(226, 55, 68, 0.2);
+                    box-shadow: 0 10px 30px rgba(226, 55, 68, 0.3);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     gap: 8px;
+                    position: relative;
+                    overflow: hidden;
+                }
+                .btn-modern::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                    transition: left 0.5s;
+                }
+                .btn-modern:hover::before {
+                    left: 100%;
                 }
                 .btn-modern:hover:not(:disabled) {
                     transform: translateY(-3px);
-                    box-shadow: 0 15px 40px rgba(226, 55, 68, 0.3);
+                    box-shadow: 0 15px 40px rgba(226, 55, 68, 0.4);
+                }
+                .btn-modern:active:not(:disabled) {
+                    transform: translateY(-1px);
                 }
                 .btn-modern:disabled {
                     opacity: 0.7;
@@ -118,27 +154,64 @@ const Login = () => {
                     top: 50%;
                     transform: translateY(-50%);
                     color: #9CA3AF;
+                    transition: color 0.3s ease;
                 }
-                .input-modern:focus + .icon-wrapper, .input-modern:focus ~ .icon-wrapper {
+                .input-modern:focus ~ .icon-wrapper {
                     color: #E23744;
+                }
+                .gradient-text {
+                    background: linear-gradient(135deg, #E23744 0%, #F59E0B 100%);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                .feature-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 0.5rem 1rem;
+                    background: rgba(226, 55, 68, 0.1);
+                    border: 1px solid rgba(226, 55, 68, 0.3);
+                    border-radius: 2rem;
+                    font-size: 0.85rem;
+                    color: #E23744;
+                    font-weight: 600;
+                }
+                .glow-circle {
+                    position: absolute;
+                    width: 300px;
+                    height: 300px;
+                    border-radius: 50%;
+                    background: radial-gradient(circle, rgba(226, 55, 68, 0.15) 0%, transparent 70%);
+                    filter: blur(40px);
+                    animation: pulse 4s ease-in-out infinite;
                 }
             `}</style>
 
-            <div className="floating-emoji" style={{ top: '10%', left: '10%', animation: 'float 6s ease-in-out infinite' }}>🍔</div>
-            <div className="floating-emoji" style={{ bottom: '15%', right: '15%', animation: 'float 7s ease-in-out infinite' }}>🍕</div>
+            {/* Glowing Background Circles */}
+            <div className="glow-circle" style={{ top: '10%', left: '10%' }} />
+            <div className="glow-circle" style={{ bottom: '10%', right: '10%', animationDelay: '2s' }} />
+
+            {/* Floating Food Emojis */}
+            <div className="floating-emoji" style={{ top: '15%', left: '8%', animationDelay: '0s' }}>🍔</div>
+            <div className="floating-emoji" style={{ top: '25%', right: '12%', animationDelay: '1s' }}>🍕</div>
+            <div className="floating-emoji" style={{ bottom: '20%', left: '15%', animationDelay: '2s' }}>🍟</div>
+            <div className="floating-emoji" style={{ bottom: '30%', right: '10%', animationDelay: '1.5s' }}>🥤</div>
+            <div className="floating-emoji" style={{ top: '50%', left: '5%', animationDelay: '0.5s' }}>🌮</div>
 
             {/* Main Login Card */}
             <div className="glass-card" style={{
                 width: '90%',
-                maxWidth: '420px',
+                maxWidth: '450px',
                 padding: '3rem 2rem',
                 zIndex: 10
             }}>
                 {/* Logo & Title */}
                 <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                    {/* Animated Logo */}
                     <div style={{
-                        width: '72px',
-                        height: '72px',
+                        width: '80px',
+                        height: '80px',
                         background: 'linear-gradient(135deg, #E23744 0%, #DC2626 100%)',
                         borderRadius: '24px',
                         display: 'flex',
@@ -146,18 +219,50 @@ const Login = () => {
                         justifyContent: 'center',
                         margin: '0 auto 1.5rem',
                         transform: 'rotate(-5deg)',
-                        boxShadow: '0 10px 30px rgba(226, 55, 68, 0.3)'
+                        boxShadow: '0 10px 30px rgba(226, 55, 68, 0.4)',
+                        position: 'relative'
                     }}>
-                        <UtensilsCrossed color="white" size={36} />
+                        <UtensilsCrossed color="white" size={40} />
+                        <div style={{
+                            position: 'absolute',
+                            top: '-8px',
+                            right: '-8px',
+                            background: '#22C55E',
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '3px solid #0D0D0D'
+                        }}>
+                            <Sparkles size={12} color="white" />
+                        </div>
                     </div>
 
-                    <h1 style={{
-                        fontSize: '2rem',
-                        fontWeight: 700,
+                    <h1 className="gradient-text" style={{
+                        fontSize: '2.5rem',
+                        fontWeight: 800,
                         marginBottom: '0.5rem',
                         letterSpacing: '-1px'
-                    }}>Campus Bites</h1>
-                    <p style={{ color: '#9CA3AF', fontSize: '0.95rem' }}>Your favorite canteen, now online</p>
+                    }}>
+                        Campus Bites
+                    </h1>
+                    <p style={{ color: '#9CA3AF', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+                        Your favorite canteen, now online
+                    </p>
+
+                    {/* Feature Badges */}
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <div className="feature-badge">
+                            <ChefHat size={14} />
+                            Fresh Food
+                        </div>
+                        <div className="feature-badge">
+                            <Sparkles size={14} />
+                            Quick Pickup
+                        </div>
+                    </div>
                 </div>
 
                 {/* Error Message */}
@@ -170,16 +275,14 @@ const Login = () => {
                         marginBottom: '1.5rem',
                         fontSize: '0.9rem',
                         textAlign: 'center',
-                        border: '1px solid rgba(239, 68, 68, 0.2)'
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        animation: 'slideIn 0.3s ease-out'
                     }}>{error}</div>
                 )}
 
                 {/* Login Form */}
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
-                        <div className="icon-wrapper">
-                            <Mail size={20} />
-                        </div>
                         <input
                             type="email"
                             className="input-modern"
@@ -188,12 +291,12 @@ const Login = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
+                        <div className="icon-wrapper">
+                            <Mail size={20} />
+                        </div>
                     </div>
 
                     <div style={{ marginBottom: '2rem', position: 'relative' }}>
-                        <div className="icon-wrapper">
-                            <Lock size={20} />
-                        </div>
                         <input
                             type="password"
                             className="input-modern"
@@ -202,27 +305,89 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        <div className="icon-wrapper">
+                            <Lock size={20} />
+                        </div>
                     </div>
 
                     <button type="submit" className="btn-modern" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Sign In'} <ArrowRight size={20} />
+                        {loading ? (
+                            <>
+                                <div style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    border: '3px solid rgba(255,255,255,0.3)',
+                                    borderTop: '3px solid white',
+                                    borderRadius: '50%',
+                                    animation: 'spin 0.8s linear infinite'
+                                }} />
+                                Logging in...
+                            </>
+                        ) : (
+                            <>
+                                Sign In <ArrowRight size={20} />
+                            </>
+                        )}
                     </button>
                 </form>
 
-                {/* Register Link */}
-                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                    <p style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>
-                        New to Campus Bites?{' '}
-                        <a href="/register" style={{
-                            color: '#E23744',
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                        }}>
-                            Create Account
-                        </a>
-                    </p>
+                {/* Divider */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    margin: '2rem 0',
+                    color: '#6B7280',
+                    fontSize: '0.85rem'
+                }}>
+                    <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                    <span>New to Campus Bites?</span>
+                    <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
                 </div>
+
+                {/* Register Link */}
+                <a href="/register" style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '1rem',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '1rem',
+                    color: 'white',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    transition: 'all 0.3s ease'
+                }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(226, 55, 68, 0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(226, 55, 68, 0.3)';
+                        e.currentTarget.style.color = '#E23744';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                        e.currentTarget.style.color = 'white';
+                    }}>
+                    Create New Account
+                </a>
+
+                {/* Footer */}
+                <p style={{
+                    textAlign: 'center',
+                    marginTop: '2rem',
+                    color: '#6B7280',
+                    fontSize: '0.8rem'
+                }}>
+                    By continuing, you agree to our Terms & Privacy Policy
+                </p>
             </div>
+
+            {/* Spinning Animation for Loading */}
+            <style>{`
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     )
 }
