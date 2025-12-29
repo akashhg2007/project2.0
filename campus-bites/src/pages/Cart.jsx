@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Minus, Plus, Clock } from 'lucide-react';
+import { Minus, Plus, Clock, ShoppingBag, ArrowRight, CreditCard, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
@@ -35,6 +35,7 @@ const Cart = () => {
 
             if (res.ok) {
                 clearCart();
+                // Custom vibration/success feedback could go here
                 alert('Order placed successfully!');
                 navigate('/dashboard/orders');
             } else {
@@ -49,66 +50,182 @@ const Cart = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div className="card text-center" style={{ padding: '3rem' }}>
-                <h2>Your Cart is Empty</h2>
-                <p className="text-gray mt-2">Looks like you haven't added any delicious food yet.</p>
+            <div style={{
+                minHeight: '80vh',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+                color: 'white'
+            }}>
+                <div style={{
+                    background: 'rgba(226, 55, 68, 0.1)',
+                    padding: '2rem',
+                    borderRadius: '50%',
+                    marginBottom: '1.5rem'
+                }}>
+                    <ShoppingBag size={64} color="#E23744" opacity={0.6} />
+                </div>
+                <h2 style={{ marginBottom: '0.5rem' }}>Your Cart is Empty</h2>
+                <p style={{ color: '#9CA3AF' }}>Looks like you haven't added any delicious food yet.</p>
+                <button
+                    onClick={() => navigate('/dashboard/menu')}
+                    style={{
+                        marginTop: '2rem',
+                        background: '#E23744',
+                        color: 'white',
+                        border: 'none',
+                        padding: '1rem 2rem',
+                        borderRadius: '20px',
+                        cursor: 'pointer',
+                        fontWeight: 600
+                    }}
+                >
+                    Browse Menu
+                </button>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className="card mb-4" style={{ padding: '1.5rem' }}>
-                <h2 className="mb-4">Your Cart</h2>
+        <div style={{ padding: '2rem 1rem 8rem 1rem', color: 'white' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '2rem' }}>Cart</h1>
+
+            {/* Cart Items List */}
+            <div style={{ marginBottom: '2rem' }}>
                 {cartItems.map(item => (
-                    <div key={item._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F3F4F6', padding: '1rem 0' }}>
-                        <div>
-                            <h4 style={{ marginBottom: '0.25rem' }}>{item.name}</h4>
-                            <p className="text-gray text-sm">₹{item.price} each</p>
+                    <div key={item._id} className="glass-panel" style={{
+                        marginBottom: '1rem',
+                        padding: '1rem',
+                        borderRadius: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem'
+                    }}>
+                        {/* Tiny Image Thumbnail */}
+                        <div style={{ width: '60px', height: '60px', borderRadius: '12px', overflow: 'hidden' }}>
+                            <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#F3F4F6', borderRadius: '0.5rem' }}>
-                                <button onClick={() => updateQuantity(item._id, -1)} style={{ padding: '0.5rem', cursor: 'pointer', color: '#EF4444' }} disabled={item.quantity <= 1 && false}><Minus size={16} /></button>
-                                <span style={{ padding: '0 0.5rem', fontWeight: 600 }}>{item.quantity}</span>
-                                <button onClick={() => updateQuantity(item._id, 1)} style={{ padding: '0.5rem', cursor: 'pointer', color: '#10B981' }}><Plus size={16} /></button>
-                            </div>
-                            <div style={{ fontWeight: 600, minWidth: '60px', textAlign: 'right' }}>₹{item.price * item.quantity}</div>
+
+                        <div style={{ flex: 1 }}>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '4px' }}>{item.name}</h3>
+                            <p style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>₹{item.price}</p>
+                        </div>
+
+                        {/* Quantity Controls */}
+                        <div style={{
+                            background: '#27272A',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '4px'
+                        }}>
+                            <button
+                                onClick={() => item.quantity > 1 ? updateQuantity(item._id, -1) : removeFromCart(item._id)}
+                                style={{ background: 'transparent', border: 'none', color: '#E23744', padding: '6px', cursor: 'pointer' }}
+                            >
+                                <Minus size={16} />
+                            </button>
+                            <span style={{ margin: '0 8px', fontWeight: 600, fontSize: '0.9rem' }}>{item.quantity}</span>
+                            <button
+                                onClick={() => updateQuantity(item._id, 1)}
+                                style={{ background: 'transparent', border: 'none', color: '#E23744', padding: '6px', cursor: 'pointer' }}
+                            >
+                                <Plus size={16} />
+                            </button>
                         </div>
                     </div>
                 ))}
-                <div style={{ borderTop: '2px solid #F3F4F6', marginTop: '1rem', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3>Total</h3>
-                    <h3 style={{ color: '#EF4444' }}>₹{cartTotal}</h3>
+            </div>
+
+            {/* Bill Details */}
+            <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '24px', marginBottom: '2rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem' }}>Bill Details</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', color: '#9CA3AF', fontSize: '0.9rem' }}>
+                    <span>Item Total</span>
+                    <span>₹{cartTotal}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', color: '#9CA3AF', fontSize: '0.9rem' }}>
+                    <span>Delivery Fee</span>
+                    <span style={{ color: '#22C55E' }}>Free</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', color: '#9CA3AF', fontSize: '0.9rem' }}>
+                    <span>Govt Taxes & Charges</span>
+                    <span>₹{Math.round(cartTotal * 0.05)}</span>
+                </div>
+                <div style={{
+                    borderTop: '1px solid rgba(255,255,255,0.1)',
+                    paddingTop: '1rem',
+                    marginTop: '1rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontWeight: 700,
+                    fontSize: '1.2rem'
+                }}>
+                    <span>To Pay</span>
+                    <span>₹{cartTotal + Math.round(cartTotal * 0.05)}</span>
                 </div>
             </div>
 
-            <div className="card mb-4">
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                    <Clock className="text-gray" style={{ marginRight: '0.5rem' }} />
-                    <h3>Select Pickup Time</h3>
+            {/* Pickup Time Selection */}
+            <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Clock size={16} color="#E23744" /> Pickup Time
+                </h3>
+                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
+                    {['12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM'].map(time => (
+                        <button
+                            key={time}
+                            onClick={() => setPickupTime(time)}
+                            style={{
+                                minWidth: 'auto',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '12px',
+                                border: pickupTime === time ? '1px solid #E23744' : '1px solid #27272A',
+                                background: pickupTime === time ? '#E23744' : '#27272A',
+                                color: 'white',
+                                fontSize: '0.9rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            {time}
+                        </button>
+                    ))}
                 </div>
-                <select
-                    className="input-field"
-                    value={pickupTime}
-                    onChange={(e) => setPickupTime(e.target.value)}
-                >
-                    <option value="">Choose a time slot</option>
-                    <option value="12:00 PM">12:00 PM</option>
-                    <option value="12:30 PM">12:30 PM</option>
-                    <option value="01:00 PM">01:00 PM</option>
-                    <option value="01:30 PM">01:30 PM</option>
-                    <option value="02:00 PM">02:00 PM</option>
-                </select>
-                <p className="text-sm text-gray mt-2">Orders can be placed 30 minutes to 6 hours in advance.</p>
             </div>
 
+            {/* Checkout Button */}
             <button
-                className="btn btn-primary"
-                style={{ padding: '1rem', fontSize: '1.1rem' }}
                 onClick={handleCheckout}
                 disabled={loading}
+                style={{
+                    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                    color: 'white',
+                    border: 'none',
+                    width: '100%',
+                    padding: '1.2rem',
+                    borderRadius: '24px',
+                    fontSize: '1.1rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.7 : 1,
+                    boxShadow: '0 8px 20px rgba(226, 55, 68, 0.4)',
+                    transition: 'transform 0.2s ease'
+                }}
             >
-                {loading ? 'Processing...' : `Pay ₹${cartTotal} & Place Order`}
+                <span>{loading ? 'Processing...' : 'Place Order'}</span>
+                <div style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: '12px',
+                    padding: '8px'
+                }}>
+                    <ArrowRight size={20} />
+                </div>
             </button>
         </div>
     );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Clock, CheckCircle, Package } from 'lucide-react';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -25,40 +26,86 @@ const Orders = () => {
         fetchOrders();
     }, [user.id]);
 
-    if (loading) return <div className="p-4">Loading orders...</div>;
+    if (loading) return <div style={{ padding: '2rem', color: '#9CA3AF' }}>Loading orders...</div>;
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'completed': return '#22C55E';
+            case 'preparing': return '#F59E0B';
+            case 'ready': return '#3B82F6';
+            default: return '#9CA3AF';
+        }
+    };
 
     return (
-        <div>
-            <h2 className="mb-4">My Orders</h2>
+        <div style={{ padding: '2rem 1rem 8rem 1rem', color: 'white' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '2rem' }}>My Orders</h1>
+
             {orders.map(order => (
-                <div key={order._id} className="card mb-4" style={{ padding: '1.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>
-                        <div>
-                            <strong>#{order._id.slice(-6)}</strong>
-                            <div className="text-sm text-gray">{new Date(order.createdAt).toLocaleDateString()}</div>
+                <div key={order._id} className="glass-panel" style={{
+                    marginBottom: '1rem',
+                    padding: '1.25rem',
+                    borderRadius: '20px'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{
+                                background: 'rgba(255,255,255,0.1)',
+                                padding: '8px',
+                                borderRadius: '10px'
+                            }}>
+                                <Package size={20} color="#E23744" />
+                            </div>
+                            <div>
+                                <strong style={{ fontSize: '0.9rem', display: 'block' }}>Order #{order._id.slice(-6)}</strong>
+                                <span style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>{new Date(order.createdAt).toLocaleDateString()}</span>
+                            </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                            <span style={{
-                                backgroundColor: order.status === 'completed' ? '#D1FAE5' : '#FEF3C7',
-                                color: order.status === 'completed' ? '#059669' : '#D97706',
-                                padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.875rem', fontWeight: 600,
-                                textTransform: 'capitalize'
+                            <div style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                background: `rgba(${status === 'completed' ? '34, 197, 94' : '245, 158, 11'}, 0.1)`,
+                                padding: '4px 10px',
+                                borderRadius: '20px',
+                                border: `1px solid ${getStatusColor(order.status)}`,
+                                fontSize: '0.8rem',
+                                color: getStatusColor(order.status),
+                                textTransform: 'capitalize',
+                                fontWeight: 600
                             }}>
+                                {order.status === 'completed' ? <CheckCircle size={12} /> : <Clock size={12} />}
                                 {order.status}
-                            </span>
-                            <div style={{ fontWeight: 600, marginTop: '0.25rem' }}>₹{order.totalAmount}</div>
+                            </div>
+                            <div style={{ fontWeight: 700, marginTop: '6px', fontSize: '1.1rem' }}>₹{order.totalAmount}</div>
                         </div>
                     </div>
+
                     <div>
                         {order.items.map((item, idx) => (
-                            <div key={idx} className="text-sm text-gray" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                                <span>{item.quantity}x {item.product?.name || 'Unknown Item'}</span>
+                            <div key={idx} style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                marginBottom: '0.5rem',
+                                fontSize: '0.9rem',
+                                color: '#D1D5DB'
+                            }}>
+                                <span style={{ display: 'flex', gap: '8px' }}>
+                                    <span style={{ color: '#E23744', fontWeight: 600 }}>{item.quantity}x</span>
+                                    {item.product?.name || 'Unknown Item'}
+                                </span>
                             </div>
                         ))}
                     </div>
                 </div>
             ))}
-            {orders.length === 0 && <p className="text-center text-gray">No orders found.</p>}
+
+            {orders.length === 0 && (
+                <div style={{ textAlign: 'center', color: '#9CA3AF', marginTop: '4rem' }}>
+                    <p>No past orders found.</p>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Star, Clock, TrendingUp } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { ShoppingCart, Star, Clock, Search, TrendingUp, Sparkles, Filter } from 'lucide-react';
 
 const Menu = () => {
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState('All');
     const { addToCart } = useCart();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -39,231 +41,181 @@ const Menu = () => {
 
     const filteredProducts = category === 'All' ? products : products.filter(p => p.category === category);
 
-    if (loading) return <div className="text-center mt-6">Loading menu...</div>;
+    if (loading) return (
+        <div style={{
+            minHeight: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: '#9CA3AF'
+        }}>
+            <Sparkles className="animate-pulse" size={48} color="#E23744" />
+        </div>
+    );
 
     return (
-        <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
-            <style>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes slideIn {
-                    from { opacity: 0; transform: translateX(-20px); }
-                    to { opacity: 1; transform: translateX(0); }
-                }
-                .product-card {
-                    background: white;
-                    border-radius: 1.5rem;
-                    overflow: hidden;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-                    transition: all 0.3s ease;
-                    animation: fadeIn 0.5s ease;
-                }
-                .product-card:hover {
-                    transform: translateY(-8px);
-                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-                }
-                .category-btn {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 1rem;
-                    border-radius: 1.5rem;
-                    border: 2px solid transparent;
-                    background: white;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    min-width: 100px;
-                }
-                .category-btn:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.2);
-                }
-                .category-btn.active {
-                    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-                    color: white;
-                    border-color: #EF4444;
-                }
-                .hero-section {
-                    background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
-                    padding: 3rem 2rem;
-                    position: relative;
-                    overflow: hidden;
-                }
-                .hero-bg-image {
-                    position: absolute;
-                    width: 200px;
-                    height: 200px;
-                    border-radius: 50%;
-                    opacity: 0.1;
-                    object-fit: cover;
-                }
-                .discount-badge {
-                    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-                    color: white;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 2rem;
-                    font-weight: 700;
-                    font-size: 1.5rem;
-                    display: inline-block;
-                    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
-                }
-                .add-to-cart-btn {
-                    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-                    color: white;
-                    border: none;
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 1rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                }
-                .add-to-cart-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.4);
-                }
-            `}</style>
+        <div style={{ padding: '0 1rem 8rem 1rem' }}>
+            {/* Header / Hero */}
+            <div style={{ paddingTop: '2rem', marginBottom: '2rem' }}>
+                <p style={{ color: '#E23744', fontSize: '0.9rem', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>
+                    Campus Bites
+                </p>
+                <h1 style={{
+                    fontSize: '2.5rem',
+                    fontWeight: 800,
+                    lineHeight: '1.2',
+                    marginTop: '0.5rem',
+                    background: 'linear-gradient(90deg, #FFF 0%, #A5A5A5 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                }}>
+                    Hungry, {user?.name?.split(' ')[0] || 'Peer'}? 😋
+                </h1>
 
-            {/* Hero Section with Dark Background */}
-            <div className="hero-section">
-                {/* Background Food Images */}
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" className="hero-bg-image" style={{ top: '10%', left: '5%' }} alt="" />
-                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400" className="hero-bg-image" style={{ top: '20%', right: '10%' }} alt="" />
-                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" className="hero-bg-image" style={{ bottom: '10%', left: '15%' }} alt="" />
-
-                <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                        <div className="discount-badge" style={{ animation: 'fadeIn 0.8s ease' }}>
-                            15% <span style={{ fontSize: '1rem', fontWeight: 500 }}>EXTRA DISCOUNT</span>
+                {/* Search Omni-bar */}
+                <div style={{
+                    marginTop: '1.5rem',
+                    position: 'relative'
+                }}>
+                    <div className="glass-panel" style={{
+                        borderRadius: '20px',
+                        padding: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem'
+                    }}>
+                        <Search color="#9CA3AF" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search 'Masala Dosa'..."
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'white',
+                                width: '100%',
+                                fontSize: '1rem',
+                                outline: 'none'
+                            }}
+                        />
+                        <div style={{
+                            background: 'rgba(226, 55, 68, 0.1)',
+                            borderRadius: '10px',
+                            padding: '8px'
+                        }}>
+                            <Filter size={18} color="#E23744" />
                         </div>
-                        <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: 700, marginTop: '1.5rem', marginBottom: '0.5rem' }}>
-                            Get your first order
-                        </h1>
-                        <p style={{ color: '#9CA3AF', fontSize: '1.2rem' }}>delivery free!</p>
                     </div>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
-                {/* Category Filter */}
+            {/* Categories */}
+            <div style={{ marginBottom: '2rem' }}>
                 <div style={{
                     display: 'flex',
                     gap: '1rem',
-                    marginBottom: '2rem',
                     overflowX: 'auto',
                     paddingBottom: '1rem',
-                    animation: 'slideIn 0.6s ease'
+                    /* Hide scrollbar for clean look */
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
                 }}>
                     {categories.map(cat => (
                         <button
                             key={cat.name}
                             onClick={() => setCategory(cat.name)}
-                            className={`category-btn ${category === cat.name ? 'active' : ''}`}
+                            style={{
+                                minWidth: 'auto',
+                                padding: '0.75rem 1.5rem',
+                                borderRadius: '100px',
+                                border: category === cat.name ? '1px solid #E23744' : '1px solid rgba(255,255,255,0.1)',
+                                background: category === cat.name ? 'rgba(226, 55, 68, 0.1)' : 'transparent',
+                                color: category === cat.name ? '#E23744' : '#9CA3AF',
+                                fontSize: '0.9rem',
+                                fontWeight: 600,
+                                whiteSpace: 'nowrap',
+                                transition: 'all 0.3s ease'
+                            }}
                         >
-                            <span style={{ fontSize: '2rem' }}>{cat.emoji}</span>
-                            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{cat.name}</span>
+                            <span style={{ marginRight: '8px' }}>{cat.emoji}</span>
+                            {cat.name}
                         </button>
                     ))}
                 </div>
+            </div>
 
-                {/* Section Title */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1F2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <TrendingUp size={28} color="#EF4444" />
-                        Popular Items
-                    </h2>
-                    <span style={{ color: '#6B7280', fontSize: '0.9rem' }}>{filteredProducts.length} items</span>
-                </div>
+            {/* Product Grid */}
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Popular Now <TrendingUp size={20} color="#E23744" />
+            </h2>
 
-                {/* Product Grid */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                    gap: '2rem'
-                }}>
-                    {filteredProducts.map((product, index) => (
-                        <div key={product._id} className="product-card" style={{ animationDelay: `${index * 0.1}s` }}>
-                            {/* Product Image */}
-                            <div style={{ position: 'relative' }}>
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    style={{ width: '100%', height: '200px', objectFit: 'cover' }}
-                                />
-                                {/* Discount Badge on Image */}
-                                {index % 3 === 0 && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '1rem',
-                                        left: '1rem',
-                                        background: '#EF4444',
-                                        color: 'white',
-                                        padding: '0.5rem 1rem',
-                                        borderRadius: '2rem',
-                                        fontSize: '0.85rem',
-                                        fontWeight: 600
-                                    }}>
-                                        15% off
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Product Info */}
-                            <div style={{ padding: '1.5rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
-                                    <div>
-                                        <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1F2937', marginBottom: '0.25rem' }}>
-                                            {product.name}
-                                        </h3>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6B7280', fontSize: '0.85rem' }}>
-                                            <Clock size={14} />
-                                            <span>10-15 min</span>
-                                        </div>
-                                    </div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.25rem',
-                                        background: '#FEF3C7',
-                                        padding: '0.5rem 0.75rem',
-                                        borderRadius: '0.75rem'
-                                    }}>
-                                        <Star size={16} fill="#F59E0B" color="#F59E0B" />
-                                        <span style={{ fontWeight: 700, color: '#D97706' }}>4.8</span>
-                                    </div>
-                                </div>
-
-                                <p style={{ color: '#6B7280', fontSize: '0.9rem', marginBottom: '1rem', minHeight: '2.5rem' }}>
-                                    {product.description}
-                                </p>
-
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div>
-                                        <span style={{ fontSize: '0.75rem', color: '#9CA3AF', textDecoration: 'line-through' }}>
-                                            ₹{Math.round(product.price * 1.15)}
-                                        </span>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#EF4444' }}>
-                                            ₹{product.price}
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => addToCart(product)}
-                                        className="add-to-cart-btn"
-                                    >
-                                        <ShoppingCart size={18} />
-                                        Add
-                                    </button>
-                                </div>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                gap: '1rem'
+            }}>
+                {filteredProducts.map((product) => (
+                    <div key={product._id} className="glass-panel" style={{
+                        borderRadius: '24px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        transition: 'transform 0.3s ease',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        {/* Image */}
+                        <div style={{ height: '140px', overflow: 'hidden', position: 'relative' }}>
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div style={{
+                                position: 'absolute',
+                                top: '8px',
+                                right: '8px',
+                                background: 'rgba(0,0,0,0.6)',
+                                backdropFilter: 'blur(4px)',
+                                borderRadius: '12px',
+                                padding: '4px 8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '0.75rem'
+                            }}>
+                                <Clock size={12} color="#9CA3AF" />
+                                <span style={{ color: 'white' }}>15m</span>
                             </div>
                         </div>
-                    ))}
-                </div>
+
+                        {/* Content */}
+                        <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.name}</h3>
+                            <p style={{ fontSize: '0.8rem', color: '#9CA3AF', marginBottom: '1rem', flex: 1 }}>{product.category}</p>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                                <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#E23744' }}>₹{product.price}</span>
+                                <button
+                                    onClick={() => addToCart(product)}
+                                    style={{
+                                        background: '#E23744',
+                                        color: 'white',
+                                        border: 'none',
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '10px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 12px rgba(226, 55, 68, 0.4)'
+                                    }}
+                                >
+                                    <ShoppingCart size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
