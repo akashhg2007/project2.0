@@ -1,109 +1,368 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Clock, CheckCircle, Package } from 'lucide-react';
+import {
+    Clock, CheckCircle, Package, ChefHat, RefreshCw,
+    Calendar, ChevronRight, ShoppingBag, Utensils
+} from 'lucide-react';
+import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const { user } = useAuth();
+    const { addToCart } = useCart();
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/mine`, {
-                    headers: { 'x-user-id': user.id }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setOrders(data);
-                }
-            } catch (err) {
-                console.error('Error fetching orders', err);
-            } finally {
-                setLoading(false);
+    const fetchOrders = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/mine`, {
+                headers: { 'x-user-id': user.id }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                // Sort by date (newest first)
+                setOrders(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
             }
-        };
-        fetchOrders();
-    }, [user.id]);
-
-    if (loading) return <div style={{ padding: '2rem', color: '#9CA3AF' }}>Loading orders...</div>;
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'completed': return '#22C55E';
-            case 'preparing': return '#F59E0B';
-            case 'ready': return '#3B82F6';
-            default: return '#9CA3AF';
+        } catch (err) {
+            console.error('Error fetching orders', err);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
         }
     };
 
+    useEffect(() => {
+        fetchOrders();
+    }, [user.id]);
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        fetchOrders();
+    };
+
+    const handleReorder = (order) => {
+        // Simple reorder logic: add items to cart
+        order.items.forEach(item => {
+            if (item.product) {
+                // We add each item. Note: This might stack with existing items.
+                // For a more robust reorder, we might want to clear cart first or ask user.
+                // For now, let's just add them.
+                for (let i = 0; i < item.quantity; i++) {
+                    addToCart(item.product);
+                }
+            }
+        });
+        navigate('/dashboard/cart');
+    };
+
+    const getStatusConfig = (status) => {
+        switch (status) {
+            case 'pending':
+                return {
+                    color: '#F59E0B',
+                    icon: Clock,
+                    label: 'Order Placed',
+                    progress: 25,
+                    desc: 'Waiting for confirmation'
+                };
+            case 'preparing':
+                return {
+                    color: '#E23744',
+                    icon: ChefHat,
+                    label: 'Preparing',
+                    progress: 50,
+                    desc: 'Chef is cooking your meal'
+                };
+            case 'ready':
+                return {
+                    color: '#3B82F6',
+                    icon: Package,
+                    label: 'Ready for Pickup',
+                    progress: 75,
+                    desc: 'Order is packed & ready'
+                };
+            case 'completed':
+                return {
+                    color: '#22C55E',
+                    icon: CheckCircle,
+                    label: 'Completed',
+                    progress: 100,
+                    desc: 'Enjoy your meal!'
+                };
+            default:
+                return {
+                    color: '#9CA3AF',
+                    icon: Clock,
+                    label: status,
+                    progress: 0,
+                    desc: 'Status unknown'
+                };
+        }
+    };
+
+    if (loading) return (
+        <div style={{
+            minHeight: '80vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: '#9CA3AF'
+        }}>
+            <div style={{ textAlign: 'center' }}>
+                <RefreshCw className="animate-spin" size={32} color="#E23744" />
+                <p style={{ marginTop: '1rem' }}>Loading your orders...</p>
+            </div>
+        </div>
+    );
+
     return (
         <div style={{ padding: '2rem 1rem 8rem 1rem', color: 'white' }}>
-            <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '2rem' }}>My Orders</h1>
+            <style>{`
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes pulse-soft {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.6; }
+                }
+                .order-card {
+                    animation: slideUp 0.5s ease-out;
+                    animation-fill-mode: both;
+                }
+                .status-line {
+                    height: 4px;
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 2px;
+                    overflow: hidden;
+                    margin: 1rem 0;
+                }
+                .status-progress {
+                    height: 100%;
+                    transition: width 1s ease-in-out;
+                }
+                .refresh-btn {
+                    transition: all 0.3s ease;
+                }
+                .refresh-btn:hover {
+                    transform: rotate(180deg);
+                    color: #E23744;
+                }
+            `}</style>
 
-            {orders.map(order => (
-                <div key={order._id} className="glass-panel" style={{
-                    marginBottom: '1rem',
-                    padding: '1.25rem',
-                    borderRadius: '20px'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{
-                                background: 'rgba(255,255,255,0.1)',
-                                padding: '8px',
-                                borderRadius: '10px'
-                            }}>
-                                <Package size={20} color="#E23744" />
-                            </div>
-                            <div>
-                                <strong style={{ fontSize: '0.9rem', display: 'block' }}>Order #{order._id.slice(-6)}</strong>
-                                <span style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>{new Date(order.createdAt).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                background: `rgba(${status === 'completed' ? '34, 197, 94' : '245, 158, 11'}, 0.1)`,
-                                padding: '4px 10px',
-                                borderRadius: '20px',
-                                border: `1px solid ${getStatusColor(order.status)}`,
-                                fontSize: '0.8rem',
-                                color: getStatusColor(order.status),
-                                textTransform: 'capitalize',
-                                fontWeight: 600
-                            }}>
-                                {order.status === 'completed' ? <CheckCircle size={12} /> : <Clock size={12} />}
-                                {order.status}
-                            </div>
-                            <div style={{ fontWeight: 700, marginTop: '6px', fontSize: '1.1rem' }}>₹{order.totalAmount}</div>
-                        </div>
-                    </div>
-
-                    <div>
-                        {order.items.map((item, idx) => (
-                            <div key={idx} style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                marginBottom: '0.5rem',
-                                fontSize: '0.9rem',
-                                color: '#D1D5DB'
-                            }}>
-                                <span style={{ display: 'flex', gap: '8px' }}>
-                                    <span style={{ color: '#E23744', fontWeight: 600 }}>{item.quantity}x</span>
-                                    {item.product?.name || 'Unknown Item'}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+            {/* Header */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '2rem'
+            }}>
+                <div>
+                    <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>Your Orders</h1>
+                    <p style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>Track and view history</p>
                 </div>
-            ))}
+                <button
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                    className="refresh-btn"
+                    style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: 'none',
+                        color: 'white',
+                        padding: '10px',
+                        borderRadius: '50%',
+                        cursor: 'pointer'
+                    }}
+                >
+                    <RefreshCw size={20} className={refreshing ? 'animate-spin' : ''} />
+                </button>
+            </div>
 
-            {orders.length === 0 && (
-                <div style={{ textAlign: 'center', color: '#9CA3AF', marginTop: '4rem' }}>
-                    <p>No past orders found.</p>
+            {orders.length === 0 ? (
+                <div style={{
+                    textAlign: 'center',
+                    padding: '4rem 2rem',
+                    background: 'rgba(255,255,255,0.03)',
+                    borderRadius: '24px',
+                    border: '1px dashed rgba(255,255,255,0.1)'
+                }}>
+                    <ShoppingBag size={48} color="#E23744" style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>No orders yet</h3>
+                    <p style={{ color: '#9CA3AF', marginBottom: '2rem' }}>Looks like you haven't ordered anything yet.</p>
+                    <button
+                        onClick={() => navigate('/dashboard/menu')}
+                        style={{
+                            background: '#E23744',
+                            color: 'white',
+                            border: 'none',
+                            padding: '1rem 2rem',
+                            borderRadius: '16px',
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Browse Menu
+                    </button>
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {orders.map((order, idx) => {
+                        const status = getStatusConfig(order.status);
+                        const StatusIcon = status.icon;
+                        const date = new Date(order.createdAt);
+
+                        return (
+                            <div
+                                key={order._id}
+                                className="glass-panel order-card"
+                                style={{
+                                    padding: '1.5rem',
+                                    borderRadius: '24px',
+                                    border: '1px solid rgba(255,255,255,0.05)',
+                                    animationDelay: `${idx * 0.1}s`
+                                }}
+                            >
+                                {/* Order Header */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <div style={{
+                                            background: 'rgba(255,255,255,0.05)',
+                                            padding: '12px',
+                                            borderRadius: '16px',
+                                            height: 'fit-content'
+                                        }}>
+                                            <Utensils size={24} color={status.color} />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '4px' }}>
+                                                {order.items.map(i => i.product?.name).join(', ').slice(0, 25) + (order.items.length > 1 ? '...' : '')}
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9CA3AF', fontSize: '0.8rem' }}>
+                                                <Calendar size={12} />
+                                                <span>{date.toLocaleDateString()}</span>
+                                                <span>•</span>
+                                                <span>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        background: `rgba(${status.color === '#22C55E' ? '34, 197, 94' : '239, 68, 68'}, 0.1)`,
+                                        color: status.color,
+                                        padding: '6px 12px',
+                                        borderRadius: '20px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 700,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px'
+                                    }}>
+                                        #{order._id.slice(-4)}
+                                    </div>
+                                </div>
+
+                                {/* Status Bar */}
+                                <div className="status-line">
+                                    <div
+                                        className="status-progress"
+                                        style={{
+                                            width: `${status.progress}%`,
+                                            background: status.color,
+                                            boxShadow: `0 0 10px ${status.color}`
+                                        }}
+                                    />
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    fontSize: '0.85rem',
+                                    color: status.color,
+                                    marginBottom: '1.5rem'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <StatusIcon size={14} />
+                                        <span style={{ fontWeight: 600 }}>{status.label}</span>
+                                    </div>
+                                    <span style={{ opacity: 0.8 }}>{status.desc}</span>
+                                </div>
+
+                                {/* Items Summary */}
+                                <div style={{
+                                    background: 'rgba(0,0,0,0.2)',
+                                    borderRadius: '16px',
+                                    padding: '1rem',
+                                    marginBottom: '1rem'
+                                }}>
+                                    {order.items.map((item, i) => (
+                                        <div key={i} style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            fontSize: '0.9rem',
+                                            marginBottom: i < order.items.length - 1 ? '0.5rem' : 0,
+                                            color: '#D1D5DB'
+                                        }}>
+                                            <span>
+                                                <span style={{ color: '#9CA3AF', marginRight: '8px' }}>{item.quantity}x</span>
+                                                {item.product?.name || 'Item'}
+                                            </span>
+                                            <span>₹{(item.price || 0) * item.quantity}</span>
+                                        </div>
+                                    ))}
+                                    <div style={{
+                                        borderTop: '1px solid rgba(255,255,255,0.1)',
+                                        marginTop: '0.75rem',
+                                        paddingTop: '0.75rem',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        fontWeight: 700
+                                    }}>
+                                        <span>Total Paid</span>
+                                        <span style={{ color: '#E23744' }}>₹{order.totalAmount}</span>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <button
+                                        onClick={() => handleReorder(order)}
+                                        style={{
+                                            flex: 1,
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            color: 'white',
+                                            padding: '0.8rem',
+                                            borderRadius: '12px',
+                                            cursor: 'pointer',
+                                            fontSize: '0.9rem',
+                                            fontWeight: 600,
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        <RefreshCw size={16} /> Reorder
+                                    </button>
+                                    <button style={{
+                                        flex: 2,
+                                        background: 'linear-gradient(135deg, #E23744 0%, #DC2626 100%)',
+                                        border: 'none',
+                                        color: 'white',
+                                        padding: '0.8rem',
+                                        borderRadius: '12px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.9rem',
+                                        fontWeight: 600,
+                                        boxShadow: '0 4px 12px rgba(226, 55, 68, 0.3)'
+                                    }}>
+                                        {status.progress < 100 ? 'Track Status' : 'Rate Order'}
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>
