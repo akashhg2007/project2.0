@@ -1,6 +1,6 @@
 {
   "name": "campus-bites",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "College Canteen Pre-Order System",
   "type": "module",
   "main": "src/main.jsx",
