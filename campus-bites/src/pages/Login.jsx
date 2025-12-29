@@ -140,7 +140,6 @@ const Login = () => {
                 width: '90%',
                 maxWidth: '450px',
                 padding: '3rem 2.5rem',
-                animation: 'float 3s ease-in-out infinite',
                 zIndex: 10
             }}>
                 {/* Logo & Title */}
