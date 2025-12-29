@@ -11,10 +11,9 @@ const Dashboard = () => {
 
     const navItems = [
         { path: '/dashboard/menu', icon: Home, label: 'Home' },
-        // { path: '/dashboard/search', icon: Search, label: 'Search' }, // Future feature
         { path: '/dashboard/cart', icon: ShoppingBag, label: 'Cart', badge: cartCount },
         { path: '/dashboard/orders', icon: Receipt, label: 'Orders' },
-        // { path: '/dashboard/profile', icon: User, label: 'Profile' } // Future feature
+        { path: '/dashboard/profile', icon: User, label: 'Profile' }
     ];
 
     return (

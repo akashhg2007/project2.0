@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import Menu from './pages/Menu'
 import Cart from './pages/Cart'
 import Orders from './pages/Orders'
+import Profile from './pages/Profile'
 
 // Admin & Staff
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -53,6 +54,7 @@ function App() {
                             <Route path="menu" element={<Menu />} />
                             <Route path="cart" element={<Cart />} />
                             <Route path="orders" element={<Orders />} />
+                            <Route path="profile" element={<Profile />} />
                         </Route>
 
                         {/* Admin Dashboard */}
