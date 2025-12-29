@@ -67,6 +67,7 @@ const Menu = () => {
                     marginTop: '0.5rem',
                     background: 'linear-gradient(90deg, #FFF 0%, #A5A5A5 100%)',
                     WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                 }}>
                     Hungry, {user?.name?.split(' ')[0] || 'Peer'}? 😋
