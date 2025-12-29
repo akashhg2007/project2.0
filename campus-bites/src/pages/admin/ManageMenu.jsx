@@ -42,13 +42,22 @@ const ManageMenu = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this item?')) return;
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
                 method: 'DELETE',
-                headers: { 'x-user-id': user.id } // Mocking auth header
+                headers: { 'x-user-id': user.id }
             });
-            fetchProducts();
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert('Item deleted successfully!');
+                fetchProducts();
+            } else {
+                alert(`Failed to delete: ${data.message || 'Unknown error'}`);
+            }
         } catch (err) {
-            alert('Failed to delete');
+            console.error('Delete error:', err);
+            alert('Failed to delete: Network error');
         }
     };
 
