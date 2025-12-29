@@ -21,7 +21,18 @@ if (!mongoURI.startsWith('mongodb://') && !mongoURI.startsWith('mongodb+srv://')
 }
 
 console.log('Attempting to connect to MongoDB...');
-console.log('MongoDB URI format:', mongoURI.split('@')[0] + '@***'); // Log without exposing password
+// Safely log the URI structure to debug parsing issues
+try {
+    const uriParts = mongoURI.split('@');
+    if (uriParts.length > 1) {
+        console.log('MongoDB URI Host:', uriParts[1].split('/')[0]); // Log just the host part
+        console.log('MongoDB User:', uriParts[0].split('//')[1].split(':')[0]); // Log the username
+    } else {
+        console.error('ERROR: MongoDB URI does not contain an "@" symbol. Check the format.');
+    }
+} catch (e) {
+    console.error('Error parsing MongoDB URI for logging:', e.message);
+}
 
 mongoose.connect(mongoURI, {
     serverSelectionTimeoutMS: 5000,
