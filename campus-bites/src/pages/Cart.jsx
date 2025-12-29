@@ -171,28 +171,145 @@ const Cart = () => {
             {/* Pickup Time Selection */}
             <div style={{ marginBottom: '2rem' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Clock size={16} color="#E23744" /> Pickup Time
+                    <Clock size={16} color="#E23744" /> Select Pickup Time
                 </h3>
-                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
-                    {['12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM'].map(time => (
-                        <button
-                            key={time}
-                            onClick={() => setPickupTime(time)}
-                            style={{
-                                minWidth: 'auto',
-                                padding: '0.5rem 1rem',
+
+                <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '24px' }}>
+                    {/* Visual Clock Display */}
+                    <div style={{
+                        position: 'relative',
+                        width: '200px',
+                        height: '200px',
+                        margin: '0 auto 1.5rem',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, rgba(226, 55, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+                        border: '3px solid rgba(226, 55, 68, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        {/* Clock Face Numbers */}
+                        {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num, idx) => {
+                            const angle = (idx * 30 - 90) * (Math.PI / 180);
+                            const radius = 75;
+                            const x = Math.cos(angle) * radius;
+                            const y = Math.sin(angle) * radius;
+                            return (
+                                <div
+                                    key={num}
+                                    style={{
+                                        position: 'absolute',
+                                        left: `calc(50% + ${x}px - 12px)`,
+                                        top: `calc(50% + ${y}px - 12px)`,
+                                        width: '24px',
+                                        height: '24px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 600,
+                                        color: '#9CA3AF'
+                                    }}
+                                >
+                                    {num}
+                                </div>
+                            );
+                        })}
+
+                        {/* Center Dot */}
+                        <div style={{
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            background: '#E23744',
+                            position: 'absolute',
+                            boxShadow: '0 0 10px rgba(226, 55, 68, 0.5)'
+                        }} />
+
+                        {/* Selected Time Display */}
+                        <div style={{
+                            position: 'absolute',
+                            fontSize: '1.5rem',
+                            fontWeight: 700,
+                            color: '#E23744',
+                            textShadow: '0 2px 8px rgba(226, 55, 68, 0.3)'
+                        }}>
+                            {pickupTime || '--:--'}
+                        </div>
+                    </div>
+
+                    {/* Quick Time Slots */}
+                    <div style={{ marginBottom: '1rem' }}>
+                        <p style={{ fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '0.75rem' }}>Quick Select</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                            {['12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM'].map(time => (
+                                <button
+                                    key={time}
+                                    onClick={() => setPickupTime(time)}
+                                    style={{
+                                        padding: '0.75rem',
+                                        borderRadius: '12px',
+                                        border: pickupTime === time ? '2px solid #E23744' : '1px solid rgba(255,255,255,0.1)',
+                                        background: pickupTime === time ? 'rgba(226, 55, 68, 0.1)' : 'rgba(255,255,255,0.03)',
+                                        color: pickupTime === time ? '#E23744' : 'white',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    {time}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Manual Time Input */}
+                    <div>
+                        <p style={{ fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '0.75rem' }}>Or Enter Manually</p>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <input
+                                type="time"
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        const [hours, minutes] = e.target.value.split(':');
+                                        const hour = parseInt(hours);
+                                        const ampm = hour >= 12 ? 'PM' : 'AM';
+                                        const displayHour = hour % 12 || 12;
+                                        setPickupTime(`${displayHour.toString().padStart(2, '0')}:${minutes} ${ampm}`);
+                                    }
+                                }}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '12px',
+                                    color: 'white',
+                                    fontSize: '0.95rem',
+                                    outline: 'none'
+                                }}
+                            />
+                            <div style={{
+                                padding: '0.75rem',
+                                background: 'rgba(226, 55, 68, 0.1)',
                                 borderRadius: '12px',
-                                border: pickupTime === time ? '1px solid #E23744' : '1px solid #27272A',
-                                background: pickupTime === time ? '#E23744' : '#27272A',
-                                color: 'white',
-                                fontSize: '0.9rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            {time}
-                        </button>
-                    ))}
+                                border: '1px solid rgba(226, 55, 68, 0.3)'
+                            }}>
+                                <Clock size={20} color="#E23744" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Info Text */}
+                    <p style={{
+                        fontSize: '0.75rem',
+                        color: '#6B7280',
+                        marginTop: '1rem',
+                        textAlign: 'center'
+                    }}>
+                        Orders can be placed 30 minutes to 6 hours in advance
+                    </p>
                 </div>
             </div>
 
