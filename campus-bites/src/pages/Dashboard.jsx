@@ -6,7 +6,7 @@ import { UtensilsCrossed, ShoppingBasket, LogOut, Sparkles, User, Pizza, Receipt
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
-    const { cartCount } = useCart();
+    const { cartCount, clearCart } = useCart();
     const [cartAnim, setCartAnim] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
@@ -297,6 +297,17 @@ const Dashboard = () => {
                                 justifyContent: 'center'
                             }}>{cartCount}</span>
                         )}
+                        {/* Clear Cart Button */}
+                        <button onClick={clearCart} style={{
+                            marginLeft: '0.5rem',
+                            background: 'rgba(255,255,255,0.2)',
+                            border: 'none',
+                            color: 'white',
+                            padding: '0.25rem 0.5rem',
+                            borderRadius: '0.5rem',
+                            cursor: 'pointer',
+                            fontSize: '0.75rem'
+                        }}>Clear</button>
                     </Link>
 
                     <Link
