@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { UtensilsCrossed, ShoppingBag, History, LogOut, Sparkles, User } from 'lucide-react';
+import { UtensilsCrossed, ShoppingBasket, LogOut, Sparkles, User, Pizza, Receipt } from 'lucide-react';
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
@@ -40,6 +40,22 @@ const Dashboard = () => {
                     0%, 100% { transform: scale(1); }
                     50% { transform: scale(1.05); }
                 }
+                @keyframes slideInLeft {
+                    from { transform: translateX(-100px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideInRight {
+                    from { transform: translateX(100px); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideInCenter {
+                    from { transform: translateY(50px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes rotateIn {
+                    from { transform: rotate(-180deg) scale(0); opacity: 0; }
+                    to { transform: rotate(0deg) scale(1); opacity: 1; }
+                }
                 .glass-header {
                     background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
                     backdrop-filter: blur(20px);
@@ -68,14 +84,17 @@ const Dashboard = () => {
                     backdrop-filter: blur(20px);
                     border: 1px solid rgba(255, 255, 255, 0.5);
                     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                    animation: fadeIn 0.8s ease;
+                    animation: slideInCenter 0.8s ease;
                 }
                 .nav-link {
                     position: relative;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 }
                 .nav-link:hover {
-                    transform: translateY(-4px);
+                    transform: translateY(-6px) scale(1.05);
+                }
+                .nav-link:active {
+                    transform: translateY(-2px) scale(0.98);
                 }
                 .nav-link.active::after {
                     content: '';
@@ -88,6 +107,15 @@ const Dashboard = () => {
                     background: linear-gradient(90deg, #EF4444, #F59E0B);
                     border-radius: 2px;
                     animation: shimmer 2s infinite;
+                }
+                .nav-icon {
+                    transition: all 0.3s ease;
+                }
+                .nav-link:hover .nav-icon {
+                    transform: rotate(10deg) scale(1.2);
+                }
+                .nav-link.active .nav-icon {
+                    animation: rotateIn 0.5s ease;
                 }
                 .cart-badge {
                     background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
@@ -209,7 +237,7 @@ const Dashboard = () => {
                             fontSize: '0.95rem'
                         }}
                     >
-                        <UtensilsCrossed size={20} />
+                        <Pizza className="nav-icon" size={22} />
                         Menu
                     </Link>
 
@@ -235,7 +263,7 @@ const Dashboard = () => {
                             position: 'relative'
                         }}
                     >
-                        <ShoppingBag size={20} />
+                        <ShoppingBasket className="nav-icon" size={22} />
                         Cart
                         {cartCount > 0 && (
                             <span className="cart-badge" style={{
@@ -277,7 +305,7 @@ const Dashboard = () => {
                             fontSize: '0.95rem'
                         }}
                     >
-                        <History size={20} />
+                        <Receipt className="nav-icon" size={22} />
                         My Orders
                     </Link>
                 </div>
