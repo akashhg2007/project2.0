@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -7,8 +7,17 @@ import { UtensilsCrossed, ShoppingBasket, LogOut, Sparkles, User, Pizza, Receipt
 const Dashboard = () => {
     const { user, logout } = useAuth();
     const { cartCount } = useCart();
+    const [cartAnim, setCartAnim] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
+    // Trigger animation when cartCount changes
+    useEffect(() => {
+        if (cartCount > 0) {
+            setCartAnim(true);
+            const timer = setTimeout(() => setCartAnim(false), 400);
+            return () => clearTimeout(timer);
+        }
+    }, [cartCount]);
 
     const handleLogout = () => {
         logout();
@@ -120,6 +129,14 @@ const Dashboard = () => {
                 .cart-badge {
                     background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
                     animation: pulse 2s ease-in-out infinite;
+                }
+                @keyframes badgePop {
+                    0% { transform: scale(1); }
+                    30% { transform: scale(1.3); }
+                    100% { transform: scale(1); }
+                }
+                .cart-badge-anim {
+                    animation: badgePop 0.4s ease-out;
                 }
                 .welcome-text {
                     background: linear-gradient(90deg, #FFFFFF 0%, #FEF3C7 100%);
@@ -266,7 +283,7 @@ const Dashboard = () => {
                         <ShoppingBasket className="nav-icon" size={22} />
                         Cart
                         {cartCount > 0 && (
-                            <span className="cart-badge" style={{
+                            <span className={`cart-badge ${cartAnim ? 'cart-badge-anim' : ''}`} style={{
                                 color: 'white',
                                 borderRadius: '50%',
                                 padding: '0.25rem 0.6rem',
@@ -278,9 +295,7 @@ const Dashboard = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
-                            }}>
-                                {cartCount}
-                            </span>
+                            }}>{cartCount}</span>
                         )}
                     </Link>
 

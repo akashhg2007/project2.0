@@ -7,6 +7,7 @@ const Menu = () => {
     const [category, setCategory] = useState('All');
     const { addToCart } = useCart();
     const [loading, setLoading] = useState(true);
+    const [addedItem, setAddedItem] = useState(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -37,6 +38,12 @@ const Menu = () => {
         { name: 'Beverages', emoji: '🥤' }
     ];
 
+    const handleAddToCart = (product) => {
+        addToCart(product);
+        setAddedItem(product.name);
+        setTimeout(() => setAddedItem(null), 2000);
+    };
+
     const filteredProducts = category === 'All' ? products : products.filter(p => p.category === category);
 
     if (loading) return <div className="text-center mt-6">Loading menu...</div>;
@@ -51,6 +58,10 @@ const Menu = () => {
                 @keyframes slideIn {
                     from { opacity: 0; transform: translateX(-20px); }
                     to { opacity: 1; transform: translateX(0); }
+                }
+                @keyframes slideInFromTop {
+                    from { opacity: 0; transform: translateY(-100px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 .product-card {
                     background: white;
@@ -127,7 +138,31 @@ const Menu = () => {
                     transform: translateY(-2px);
                     box-shadow: 0 8px 16px rgba(239, 68, 68, 0.4);
                 }
+                .toast-notification {
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 1rem;
+                    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+                    z-index: 1000;
+                    animation: slideInFromTop 0.5s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    font-weight: 600;
+                }
             `}</style>
+
+            {/* Toast Notification */}
+            {addedItem && (
+                <div className="toast-notification">
+                    <ShoppingCart size={24} />
+                    <span>✓ {addedItem} added to cart!</span>
+                </div>
+            )}
 
             {/* Hero Section with Dark Background */}
             <div className="hero-section">
