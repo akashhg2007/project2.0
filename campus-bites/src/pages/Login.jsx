@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { UtensilsCrossed, Mail, Lock, ArrowRight, Sparkles, ChefHat } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 import API_URL from '../apiConfig';
 
@@ -127,19 +127,19 @@ const Login = () => {
                 }
                 .floating-emoji {
                     position: absolute;
-                    font-size: 4rem;
-                    opacity: 0.15;
-                    filter: blur(2px);
+                    font-size: 3.5rem;
+                    opacity: 0.1;
                     pointer-events: none;
-                    animation: float 6s ease-in-out infinite;
+                    animation: float 8s ease-in-out infinite;
                 }
                 .glass-card {
-                    background: rgba(28, 28, 30, 0.6);
-                    backdrop-filter: blur(20px);
+                    background: rgba(28, 28, 30, 0.8);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
                     border-radius: 2rem;
                     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
                     border: 1px solid rgba(255, 255, 255, 0.1);
-                    animation: slideIn 0.6s ease-out;
+                    animation: slideIn 0.5s ease-out;
                 }
                 .input-modern {
                     width: 100%;
@@ -445,7 +445,7 @@ const Login = () => {
                 </div>
 
                 {/* Register Link */}
-                <a href="/register" style={{
+                <Link to="/register" style={{
                     display: 'block',
                     textAlign: 'center',
                     padding: '1rem',
@@ -468,7 +468,7 @@ const Login = () => {
                         e.currentTarget.style.color = 'white';
                     }}>
                     Create New Account
-                </a>
+                </Link>
 
                 {/* Footer */}
                 <p style={{

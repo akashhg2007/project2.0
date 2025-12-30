@@ -31,7 +31,14 @@ const Register = () => {
                 })
             });
 
-            const data = await res.json();
+            let data;
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                throw new Error(text || 'Cloudflare or Server Error');
+            }
 
             if (res.ok) {
                 if (data.requiresVerification) {
@@ -45,7 +52,8 @@ const Register = () => {
                 setError(data.message || 'Registration failed');
             }
         } catch (err) {
-            setError('Server connection error');
+            console.error('Registration error:', err);
+            setError(err.message === 'Failed to fetch' ? 'Server is offline. Please try again later.' : (err.message || 'Connection error'));
         } finally {
             setLoading(false);
         }
@@ -123,14 +131,15 @@ const Register = () => {
                 }
                 .floating-emoji {
                     position: absolute;
-                    font-size: 4rem;
-                    opacity: 0.2;
-                    filter: blur(4px);
+                    font-size: 3.5rem;
+                    opacity: 0.15;
                     pointer-events: none;
+                    transition: transform 0.3s ease;
                 }
                 .glass-card {
-                    background: rgba(28, 28, 30, 0.6);
-                    backdrop-filter: blur(20px);
+                    background: rgba(28, 28, 30, 0.8);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
                     border-radius: 2rem;
                     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
                     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -138,11 +147,11 @@ const Register = () => {
                 .input-modern {
                     width: 100%;
                     box-sizing: border-box;
-                    padding: 1rem 1rem 1rem 3rem;
+                    padding: 0.85rem 1rem 0.85rem 3rem;
                     border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 1rem;
+                    border-radius: 0.85rem;
                     font-size: 1rem;
-                    transition: all 0.3s ease;
+                    transition: all 0.2s ease;
                     background: rgba(255, 255, 255, 0.05);
                     color: white;
                 }
@@ -150,31 +159,35 @@ const Register = () => {
                     outline: none;
                     border-color: #E23744;
                     background: rgba(226, 55, 68, 0.05);
+                    box-shadow: 0 0 0 2px rgba(226, 55, 68, 0.2);
                 }
                 .btn-modern {
                     width: 100%;
                     box-sizing: border-box;
-                    padding: 1rem;
+                    padding: 0.85rem;
                     background: linear-gradient(135deg, #E23744 0%, #DC2626 100%);
                     color: white;
                     border: none;
-                    border-radius: 1rem;
+                    border-radius: 0.85rem;
                     font-size: 1.1rem;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 10px 30px rgba(226, 55, 68, 0.2);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 8px 25px rgba(226, 55, 68, 0.25);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     gap: 8px;
                 }
                 .btn-modern:hover:not(:disabled) {
-                    transform: translateY(-3px);
-                    box-shadow: 0 15px 40px rgba(226, 55, 68, 0.3);
+                    transform: translateY(-2px);
+                    box-shadow: 0 12px 30px rgba(226, 55, 68, 0.35);
+                }
+                .btn-modern:active:not(:disabled) {
+                    transform: translateY(0);
                 }
                 .btn-modern:disabled {
-                    opacity: 0.7;
+                    opacity: 0.6;
                     cursor: not-allowed;
                 }
                 .icon-wrapper {
@@ -183,6 +196,7 @@ const Register = () => {
                     top: 50%;
                     transform: translateY(-50%);
                     color: #9CA3AF;
+                    pointer-events: none;
                 }
                 .input-modern:focus + .icon-wrapper, .input-modern:focus ~ .icon-wrapper {
                     color: #E23744;
@@ -193,13 +207,24 @@ const Register = () => {
                     color: #9CA3AF;
                     text-decoration: none;
                     font-weight: 500;
-                    margin-bottom: 2rem;
-                    transition: all 0.3s ease;
+                    margin-bottom: 1.5rem;
+                    transition: all 0.2s ease;
                     font-size: 0.9rem;
                 }
                 .back-link:hover {
                     color: white;
-                    transform: translateX(-5px);
+                    transform: translateX(-4px);
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+                .spinner {
+                    width: 20px;
+                    height: 20px;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-top: 2px solid white;
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
                 }
             `}</style>
 
@@ -287,7 +312,16 @@ const Register = () => {
                             </div>
 
                             <button type="submit" className="btn-modern" disabled={loading}>
-                                {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} />
+                                {loading ? (
+                                    <>
+                                        <div className="spinner" style={{ marginRight: '10px' }}></div>
+                                        Creating Account...
+                                    </>
+                                ) : (
+                                    <>
+                                        Create Account <ArrowRight size={20} />
+                                    </>
+                                )}
                             </button>
                         </form>
 
