@@ -56,6 +56,20 @@ const Cart = () => {
         }
     };
 
+    const convert12to24 = (time12h) => {
+        if (!time12h) return '';
+        try {
+            const [time, modifier] = time12h.split(' ');
+            let [hours, minutes] = time.split(':');
+            let h = parseInt(hours, 10);
+            if (modifier === 'PM' && h !== 12) h += 12;
+            if (modifier === 'AM' && h === 12) h = 0;
+            return `${String(h).padStart(2, '0')}:${minutes}`;
+        } catch (e) {
+            return '';
+        }
+    };
+
     if (cartItems.length === 0) {
         return (
             <div style={{
@@ -444,6 +458,7 @@ const Cart = () => {
                         }}>
                             <input
                                 type="time"
+                                value={convert12to24(pickupTime)}
                                 onChange={(e) => {
                                     if (e.target.value) {
                                         const [hours, minutes] = e.target.value.split(':');
