@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
+import API_URL from '../../apiConfig';
+
 const ManageMenu = () => {
     const [products, setProducts] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +18,7 @@ const ManageMenu = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
+            const res = await fetch(`${API_URL}/api/products`);
             const data = await res.json();
             setProducts(data);
         } catch (err) {
@@ -42,7 +44,7 @@ const ManageMenu = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this item?')) return;
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
+            const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: 'DELETE',
                 headers: { 'x-user-id': user.id }
             });
@@ -65,8 +67,8 @@ const ManageMenu = () => {
         e.preventDefault();
         setLoading(true);
         const url = editingProduct
-            ? `${import.meta.env.VITE_API_URL}/api/products/${editingProduct._id}`
-            : `${import.meta.env.VITE_API_URL}/api/products`;
+            ? `${API_URL}/api/products/${editingProduct._id}`
+            : `${API_URL}/api/products`;
 
         const method = editingProduct ? 'PUT' : 'POST';
 

@@ -7,6 +7,8 @@ import {
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
+import API_URL from '../apiConfig';
+
 const Orders = () => {
     const [orders, setOrders] = useState([]);
     const { user } = useAuth();
@@ -17,7 +19,7 @@ const Orders = () => {
 
     const fetchOrders = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/mine`, {
+            const res = await fetch(`${API_URL}/api/orders/mine`, {
                 headers: { 'x-user-id': user.id }
             });
             if (res.ok) {

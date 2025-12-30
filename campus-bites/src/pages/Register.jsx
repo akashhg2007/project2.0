@@ -3,6 +3,8 @@ import { UtensilsCrossed, User, Mail, Lock, ArrowLeft, ArrowRight } from 'lucide
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+import API_URL from '../apiConfig';
+
 const Register = () => {
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
     const [loading, setLoading] = useState(false);
@@ -17,7 +19,7 @@ const Register = () => {
         setError('');
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+            const res = await fetch(`${API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { Minus, Plus, Clock, ShoppingBag, ArrowRight, CreditCard, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import API_URL from '../apiConfig';
+
 const Cart = () => {
     const { cartItems, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
     const { user } = useAuth();
@@ -24,7 +26,7 @@ const Cart = () => {
                 pickupTime
             };
 
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+            const res = await fetch(`${API_URL}/api/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

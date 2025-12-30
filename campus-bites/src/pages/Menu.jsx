@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { ShoppingCart, Star, Clock, Search, TrendingUp, Sparkles, Filter } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 const Menu = () => {
     const [products, setProducts] = useState([]);
@@ -13,7 +14,7 @@ const Menu = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
+                const res = await fetch(`${API_URL}/api/products`);
                 if (!res.ok) throw new Error('Failed to fetch');
                 const data = await res.json();
                 setProducts(data);
