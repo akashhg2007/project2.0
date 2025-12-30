@@ -13,6 +13,7 @@ import Profile from './pages/Profile'
 // Admin & Staff
 import AdminDashboard from './pages/admin/AdminDashboard'
 import ManageMenu from './pages/admin/ManageMenu'
+import Analytics from './pages/admin/Analytics'
 import KitchenView from './pages/staff/KitchenView'
 import ForgotPassword from './pages/ForgotPassword'
 
@@ -67,15 +68,13 @@ function App() {
                         }>
                             <Route index element={<Navigate to="menu" replace />} />
                             <Route path="menu" element={<ManageMenu />} />
-                            <Route path="analytics" element={<div className="p-4">Analytics Module Coming Soon</div>} />
+                            <Route path="analytics" element={<Analytics />} />
                         </Route>
 
                         {/* Staff Dashboard */}
                         <Route path="/staff" element={
                             <ProtectedRoute roles={['staff']}>
-                                <div style={{ minHeight: '100vh', background: '#F3F4F6' }}>
-                                    <Outlet />
-                                </div>
+                                <Outlet />
                             </ProtectedRoute>
                         }>
                             <Route path="kitchen" element={<KitchenView />} />
