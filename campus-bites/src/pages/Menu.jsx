@@ -9,7 +9,7 @@ import API_URL from '../apiConfig';
 
 const CONTACT_INFO = {
     email: 'support@campusbites.com',
-    phone: '+91 98765 43210',
+    phone: '+91 95358 47861',
     location: 'Main Canteen, Ground Floor, Academic Block',
     instagram: '@campus.bites',
     twitter: '@campusbites_in'
