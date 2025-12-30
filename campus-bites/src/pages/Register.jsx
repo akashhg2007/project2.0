@@ -111,6 +111,7 @@ const Register = () => {
                 }
                 .input-modern {
                     width: 100%;
+                    box-sizing: border-box;
                     padding: 1rem 1rem 1rem 3rem;
                     border: 1px solid rgba(255, 255, 255, 0.1);
                     border-radius: 1rem;
@@ -126,6 +127,7 @@ const Register = () => {
                 }
                 .btn-modern {
                     width: 100%;
+                    box-sizing: border-box;
                     padding: 1rem;
                     background: linear-gradient(135deg, #E23744 0%, #DC2626 100%);
                     color: white;

@@ -111,11 +111,11 @@ const ForgotPassword = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'white', fontSize: '1rem' }}
+                                style={{ width: '100%', boxSizing: 'border-box', padding: '1rem 1rem 1rem 3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'white', fontSize: '1rem' }}
                             />
                         </div>
                         <button type="submit" disabled={loading} style={{
-                            width: '100%', padding: '1rem', background: '#E23744', color: 'white', border: 'none', borderRadius: '1rem', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer'
+                            width: '100%', boxSizing: 'border-box', padding: '1rem', background: '#E23744', color: 'white', border: 'none', borderRadius: '1rem', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer'
                         }}>
                             {loading ? 'Sending...' : 'Send Code'}
                         </button>
@@ -129,7 +129,7 @@ const ForgotPassword = () => {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
-                                style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'white', fontSize: '1rem', textAlign: 'center', letterSpacing: '2px' }}
+                                style={{ width: '100%', boxSizing: 'border-box', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'white', fontSize: '1rem', textAlign: 'center', letterSpacing: '2px' }}
                             />
                         </div>
                         <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
@@ -140,11 +140,11 @@ const ForgotPassword = () => {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
-                                style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'white', fontSize: '1rem' }}
+                                style={{ width: '100%', boxSizing: 'border-box', padding: '1rem 1rem 1rem 3rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', color: 'white', fontSize: '1rem' }}
                             />
                         </div>
                         <button type="submit" disabled={loading} style={{
-                            width: '100%', padding: '1rem', background: '#E23744', color: 'white', border: 'none', borderRadius: '1rem', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer'
+                            width: '100%', boxSizing: 'border-box', padding: '1rem', background: '#E23744', color: 'white', border: 'none', borderRadius: '1rem', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer'
                         }}>
                             {loading ? 'Updating...' : 'Set New Password'}
                         </button>
