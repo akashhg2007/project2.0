@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { ShoppingCart, Star, Clock, Search, TrendingUp, Sparkles, Filter, Plus, ChefHat, User } from 'lucide-react';
+import {
+    ShoppingCart, Star, Clock, Search, TrendingUp, Sparkles, Filter,
+    Plus, ChefHat, User, Mail, Phone, MapPin, Instagram, Twitter
+} from 'lucide-react';
 import API_URL from '../apiConfig';
+
+const CONTACT_INFO = {
+    email: 'support@campusbites.com',
+    phone: '+91 98765 43210',
+    location: 'Main Canteen, Ground Floor, Academic Block',
+    instagram: '@campus.bites',
+    twitter: '@campusbites_in'
+};
 
 const Menu = () => {
     const [products, setProducts] = useState([]);
@@ -347,6 +358,130 @@ const Menu = () => {
             </div>
 
 
+            {/* Premium High-Res Footer */}
+            <footer style={{
+                marginTop: '4rem',
+                borderRadius: '32px',
+                overflow: 'hidden',
+                position: 'relative',
+                background: '#18181B',
+                animation: 'fadeIn 1.2s ease-out'
+            }}>
+                {/* High-Res Background Image */}
+                <div style={{
+                    position: 'relative',
+                    height: '240px',
+                    width: '100%'
+                }}>
+                    <img
+                        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=600&fit=crop"
+                        alt="Footer Hero"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'linear-gradient(to bottom, transparent, #18181B)'
+                    }} />
+
+                    {/* Brand Overlay */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        left: '0',
+                        right: '0',
+                        textAlign: 'center',
+                        zIndex: 2
+                    }}>
+                        <h2 style={{ fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-1px', marginBottom: '4px' }}>
+                            Campus<span style={{ color: '#E23744' }}>Bites</span>
+                        </h2>
+                        <p style={{ fontSize: '0.8rem', color: '#9CA3AF', fontWeight: 500 }}>Deliciously Delivered.</p>
+                    </div>
+                </div>
+
+                {/* Contact & Info Content */}
+                <div style={{ padding: '2rem 1.5rem 3rem' }}>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr',
+                        gap: '1.5rem',
+                        marginBottom: '2.5rem'
+                    }}>
+                        {/* Contact Cards */}
+                        <div className="glass-panel" style={{
+                            padding: '1.2rem',
+                            borderRadius: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div style={{ background: 'rgba(226, 55, 68, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                                <Mail size={20} color="#E23744" />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.7rem', color: '#71717A', fontWeight: 700, textTransform: 'uppercase' }}>Email Us</p>
+                                <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>{CONTACT_INFO.email}</p>
+                            </div>
+                        </div>
+
+                        <div className="glass-panel" style={{
+                            padding: '1.2rem',
+                            borderRadius: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                                <Phone size={20} color="#3B82F6" />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.7rem', color: '#71717A', fontWeight: 700, textTransform: 'uppercase' }}>Call Us</p>
+                                <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>{CONTACT_INFO.phone}</p>
+                            </div>
+                        </div>
+
+                        <div className="glass-panel" style={{
+                            padding: '1.2rem',
+                            borderRadius: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div style={{ background: 'rgba(34, 197, 94, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                                <MapPin size={20} color="#22C55E" />
+                            </div>
+                            <div>
+                                <p style={{ fontSize: '0.7rem', color: '#71717A', fontWeight: 700, textTransform: 'uppercase' }}>Location</p>
+                                <p style={{ fontSize: '0.85rem', fontWeight: 600, lineHeight: '1.4' }}>{CONTACT_INFO.location}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer Socials & Bottom */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1.5rem',
+                        paddingTop: '1.5rem',
+                        borderTop: '1px solid rgba(255,255,255,0.05)'
+                    }}>
+                        <div style={{ display: 'flex', gap: '1.5rem' }}>
+                            <Instagram size={22} color="#9CA3AF" style={{ cursor: 'pointer' }} />
+                            <Twitter size={22} color="#9CA3AF" style={{ cursor: 'pointer' }} />
+                            <Star size={22} color="#9CA3AF" style={{ cursor: 'pointer' }} />
+                        </div>
+                        <p style={{ fontSize: '0.7rem', color: '#52525B', textAlign: 'center' }}>
+                            © 2026 Campus Bites. Created with ❤️ for students.<br />
+                            All rights reserved.
+                        </p>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };
