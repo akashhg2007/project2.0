@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Minus, Plus, Clock, ShoppingBag, ArrowRight, CreditCard, Wallet } from 'lucide-react';
+import { Minus, Plus, Clock, ShoppingBag, ArrowRight, CreditCard, Wallet, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import API_URL from '../apiConfig';
@@ -10,8 +10,13 @@ const Cart = () => {
     const { cartItems, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
     const { user } = useAuth();
     const [pickupTime, setPickupTime] = useState('');
+    const [isDonationChecked, setIsDonationChecked] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const taxAmount = Math.round(cartTotal * 0.05);
+    const donationAmount = isDonationChecked ? 3 : 0;
+    const finalTotal = cartTotal + taxAmount + donationAmount;
 
     const handleCheckout = async () => {
         if (!pickupTime) {
@@ -22,8 +27,9 @@ const Cart = () => {
         try {
             const orderData = {
                 items: cartItems.map(item => ({ product: item._id, quantity: item.quantity, price: item.price })),
-                totalAmount: cartTotal,
-                pickupTime
+                totalAmount: finalTotal,
+                pickupTime,
+                donation: donationAmount
             };
 
             const res = await fetch(`${API_URL}/api/orders`, {
@@ -154,8 +160,14 @@ const Cart = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', color: '#9CA3AF', fontSize: '0.9rem' }}>
                     <span>Govt Taxes & Charges</span>
-                    <span>₹{Math.round(cartTotal * 0.05)}</span>
+                    <span>₹{taxAmount}</span>
                 </div>
+                {isDonationChecked && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', color: '#E23744', fontSize: '0.9rem', fontWeight: 600 }}>
+                        <span>Feeding India Donation</span>
+                        <span>₹{donationAmount}</span>
+                    </div>
+                )}
                 <div style={{
                     borderTop: '1px solid rgba(255,255,255,0.1)',
                     paddingTop: '1rem',
@@ -166,7 +178,85 @@ const Cart = () => {
                     fontSize: '1.2rem'
                 }}>
                     <span>To Pay</span>
-                    <span>₹{cartTotal + Math.round(cartTotal * 0.05)}</span>
+                    <span>₹{finalTotal}</span>
+                </div>
+            </div>
+
+            {/* Donation Option */}
+            <div style={{ marginBottom: '2rem' }}>
+                <style>{`
+                    @keyframes pulse-heart {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                        100% { transform: scale(1); }
+                    }
+                    .donation-card {
+                        position: relative;
+                        overflow: hidden;
+                        border-radius: 24px;
+                        padding: 1.5rem;
+                        background: #1C1C1E;
+                        border: 1px solid rgba(226, 55, 68, 0.2);
+                        transition: all 0.3s ease;
+                    }
+                    .donation-bg {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-image: url('/donation.png');
+                        background-size: cover;
+                        background-position: center;
+                        opacity: 0.15;
+                        mix-blend-mode: luminosity;
+                        pointer-events: none;
+                    }
+                    .donation-content {
+                        position: relative;
+                        z-index: 1;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                `}</style>
+                <div className="donation-card" style={{
+                    borderColor: isDonationChecked ? 'rgba(226, 55, 68, 0.6)' : 'rgba(255, 255, 255, 0.1)',
+                    background: isDonationChecked ? 'rgba(226, 55, 68, 0.05)' : '#1C1C1E'
+                }}>
+                    <div className="donation-bg"></div>
+                    <div className="donation-content">
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                <Heart
+                                    size={18}
+                                    fill={isDonationChecked ? "#E23744" : "none"}
+                                    color="#E23744"
+                                    style={{ animation: isDonationChecked ? 'pulse-heart 1.5s infinite' : 'none' }}
+                                />
+                                <span style={{ fontWeight: 700, fontSize: '1rem' }}>Feeding India</span>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: '#9CA3AF', maxWidth: '80%' }}>
+                                Working towards a hunger-free India. Support a meal with just ₹3.
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => setIsDonationChecked(!isDonationChecked)}
+                            style={{
+                                background: isDonationChecked ? '#E23744' : 'rgba(255, 255, 255, 0.1)',
+                                border: 'none',
+                                color: 'white',
+                                padding: '8px 16px',
+                                borderRadius: '12px',
+                                fontSize: '0.9rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            {isDonationChecked ? 'Added' : 'Add ₹3'}
+                        </button>
+                    </div>
                 </div>
             </div>
 
