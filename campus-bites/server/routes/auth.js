@@ -17,20 +17,34 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
         // Create new user (In production, hash password!)
         const user = new User({
             name,
             email,
             password,
-            isVerified: true, // Verification removed for now
-            role: 'student'
+            otp,
+            otpExpires,
+            isVerified: false
         });
         await user.save();
+
+        // Send Email
+        const message = `Your verification code is: ${otp}`;
+        try {
+            await sendEmail(email, 'Verify your account - Campus Bites', message, `<h1>Your OTP is ${otp}</h1>`);
+        } catch (emailError) {
+            console.error('Email send failed');
+        }
 
         res.status(201).json({
             message: 'Registration successful',
             user: { id: user._id, name: user.name, email: user.email, role: user.role },
-            requiresVerification: false
+            requiresVerification: true,
+            userId: user._id
         });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });

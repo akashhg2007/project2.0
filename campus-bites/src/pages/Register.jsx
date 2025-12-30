@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
-import { UtensilsCrossed, User, Mail, Lock, ArrowLeft, ArrowRight } from 'lucide-react'
+import { User, Mail, Lock, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-
+import { GoogleLogin } from '@react-oauth/google'
 import API_URL from '../apiConfig';
 
 const Register = () => {
-    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', requiresVerification: false });
+    const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [userId, setUserId] = useState(null);
 
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -32,14 +34,67 @@ const Register = () => {
             const data = await res.json();
 
             if (res.ok) {
-                // Login immediately as verification is disabled
-                login(data.user);
-                navigate('/dashboard/menu');
+                if (data.requiresVerification) {
+                    setUserId(data.userId);
+                    setFormData(prev => ({ ...prev, requiresVerification: true }));
+                } else {
+                    login(data.user);
+                    navigate('/dashboard/menu');
+                }
             } else {
                 setError(data.message || 'Registration failed');
             }
         } catch (err) {
             setError('Server connection error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerify = async () => {
+        if (!otp) return setError('Please enter the code');
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, otp })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                login(data.user);
+                navigate('/dashboard/menu');
+            } else {
+                setError(data.message || 'Verification failed');
+            }
+        } catch (err) {
+            setError('Server connection error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await fetch(`${API_URL}/api/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: credentialResponse.credential })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                login(data.user);
+                navigate('/dashboard/menu');
+            } else {
+                setError(data.message || 'Google signup failed');
+            }
+        } catch (err) {
+            setError('Google connection error');
         } finally {
             setLoading(false);
         }
@@ -61,6 +116,10 @@ const Register = () => {
                 @keyframes float {
                     0%, 100% { transform: translateY(0px) rotate(0deg); }
                     50% { transform: translateY(-20px) rotate(5deg); }
+                }
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 .floating-emoji {
                     position: absolute;
@@ -182,53 +241,102 @@ const Register = () => {
                     }}>{error}</div>
                 )}
 
-                <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
-                        <div className="icon-wrapper">
-                            <User size={20} />
-                        </div>
-                        <input
-                            type="text"
-                            className="input-modern"
-                            placeholder="Full Name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            required
-                        />
-                    </div>
+                {!formData.requiresVerification ? (
+                    <>
+                        <form onSubmit={handleSubmit}>
+                            <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
+                                <div className="icon-wrapper">
+                                    <User size={20} />
+                                </div>
+                                <input
+                                    type="text"
+                                    className="input-modern"
+                                    placeholder="Full Name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                />
+                            </div>
 
-                    <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
-                        <div className="icon-wrapper">
-                            <Mail size={20} />
-                        </div>
-                        <input
-                            type="email"
-                            className="input-modern"
-                            placeholder="Email Address"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            required
-                        />
-                    </div>
+                            <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
+                                <div className="icon-wrapper">
+                                    <Mail size={20} />
+                                </div>
+                                <input
+                                    type="email"
+                                    className="input-modern"
+                                    placeholder="Email Address"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    required
+                                />
+                            </div>
 
-                    <div style={{ marginBottom: '2rem', position: 'relative' }}>
-                        <div className="icon-wrapper">
-                            <Lock size={20} />
-                        </div>
-                        <input
-                            type="password"
-                            className="input-modern"
-                            placeholder="Create Password"
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            required
-                        />
-                    </div>
+                            <div style={{ marginBottom: '2rem', position: 'relative' }}>
+                                <div className="icon-wrapper">
+                                    <Lock size={20} />
+                                </div>
+                                <input
+                                    type="password"
+                                    className="input-modern"
+                                    placeholder="Create Password"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    required
+                                />
+                            </div>
 
-                    <button type="submit" className="btn-modern" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} />
-                    </button>
-                </form>
+                            <button type="submit" className="btn-modern" disabled={loading}>
+                                {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} />
+                            </button>
+                        </form>
+
+                        {/* Divider */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                            margin: '2rem 0',
+                            color: '#6B7280',
+                            fontSize: '0.85rem'
+                        }}>
+                            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                            <span>Or signup with</span>
+                            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                        </div>
+
+                        {/* Google Button */}
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={() => setError('Google Signup Failed')}
+                                theme="dark"
+                                shape="pill"
+                                width="100%"
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <div style={{ animation: 'slideIn 0.3s ease-out' }}>
+                        <p style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#E5E7EB' }}>
+                            We sent a code to <span style={{ color: '#E23744' }}>{formData.email}</span>
+                        </p>
+                        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
+                            <input
+                                type="text"
+                                className="input-modern"
+                                placeholder="Enter 6-digit code"
+                                maxLength="6"
+                                style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.5rem' }}
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value)}
+                            />
+                        </div>
+                        <button onClick={handleVerify} className="btn-modern" disabled={loading}>
+                            {loading ? 'Verifying...' : 'Verify Email'} <ArrowRight size={20} />
+                        </button>
+                    </div>
+                )}
 
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                     <p style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>
