@@ -205,11 +205,10 @@ const Cart = () => {
                         left: 0;
                         width: 100%;
                         height: 100%;
-                        background-image: url('/donation.png');
+                        background: linear-gradient(90deg, rgba(28, 28, 30, 0.95) 0%, rgba(28, 28, 30, 0.4) 100%), url('/donation.png');
                         background-size: cover;
                         background-position: center;
-                        opacity: 0.15;
-                        mix-blend-mode: luminosity;
+                        opacity: 1;
                         pointer-events: none;
                     }
                     .donation-content {
