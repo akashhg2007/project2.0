@@ -225,18 +225,93 @@ const Cart = () => {
                             borderRadius: '50%',
                             background: '#E23744',
                             position: 'absolute',
+                            zIndex: 10,
                             boxShadow: '0 0 10px rgba(226, 55, 68, 0.5)'
                         }} />
+
+                        {/* Clock Hands */}
+                        {(() => {
+                            let hourDeg = 90; // Default 3 o'clock (horizontal right) is 0deg in CSS rotation if not handled carefully, but let's assume standard 12 is top.
+                            // CSS transform rotate(0deg) points UP if element is vertical.
+                            // But usually with absolute positioning we center it.
+                            // Let's parse the time string "HH:MM PM"
+                            let minuteDeg = 0;
+
+                            if (pickupTime) {
+                                try {
+                                    // Example: "12:30 PM"
+                                    const [timePart, modifier] = pickupTime.split(' ');
+                                    let [hours, minutes] = timePart.split(':').map(Number);
+
+                                    if (modifier === 'PM' && hours !== 12) hours += 12;
+                                    if (modifier === 'AM' && hours === 12) hours = 0;
+
+                                    // Convert to degrees
+                                    // 12 hours = 360 deg => 1 hour = 30 deg
+                                    // 60 min = 360 deg => 1 min = 6 deg
+                                    // Hour hand moves by minutes too: 0.5 deg per minute
+                                    hourDeg = (hours % 12) * 30 + minutes * 0.5;
+                                    minuteDeg = minutes * 6;
+                                } catch (e) {
+                                    // Default if parse fails
+                                    const now = new Date();
+                                    hourDeg = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5;
+                                    minuteDeg = now.getMinutes() * 6;
+                                }
+                            } else {
+                                // Default default: current time
+                                const now = new Date();
+                                hourDeg = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5;
+                                minuteDeg = now.getMinutes() * 6;
+                            }
+
+                            return (
+                                <>
+                                    {/* Hour Hand */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '50%',
+                                        left: '50%',
+                                        width: '4px',
+                                        height: '50px',
+                                        background: '#E23744',
+                                        borderRadius: '4px',
+                                        transformOrigin: 'bottom center',
+                                        transform: `translateX(-50%) rotate(${hourDeg}deg)`,
+                                        transition: 'transform 0.5s cubic-bezier(0.4, 2.08, 0.55, 0.44)',
+                                        zIndex: 5
+                                    }} />
+                                    {/* Minute Hand */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '50%',
+                                        left: '50%',
+                                        width: '2px',
+                                        height: '70px',
+                                        background: 'white',
+                                        borderRadius: '4px',
+                                        transformOrigin: 'bottom center',
+                                        transform: `translateX(-50%) rotate(${minuteDeg}deg)`,
+                                        transition: 'transform 0.5s cubic-bezier(0.4, 2.08, 0.55, 0.44)',
+                                        zIndex: 4
+                                    }} />
+                                </>
+                            );
+                        })()}
 
                         {/* Selected Time Display */}
                         <div style={{
                             position: 'absolute',
-                            fontSize: '1.5rem',
+                            bottom: '20%',
+                            fontSize: '1.2rem',
                             fontWeight: 700,
                             color: '#E23744',
-                            textShadow: '0 2px 8px rgba(226, 55, 68, 0.3)'
+                            textShadow: '0 2px 8px rgba(226, 55, 68, 0.3)',
+                            background: 'rgba(0,0,0,0.4)',
+                            padding: '4px 12px',
+                            borderRadius: '12px'
                         }}>
-                            {pickupTime || '--:--'}
+                            {pickupTime || 'Select Time'}
                         </div>
                     </div>
 
