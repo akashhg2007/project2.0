@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { UtensilsCrossed, Mail, Lock, ArrowRight, Sparkles, ChefHat } from 'lucide-react'
+import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -8,6 +9,9 @@ import API_URL from '../apiConfig';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [otp, setOtp] = useState('');
+    const [showOtp, setShowOtp] = useState(false);
+    const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -33,11 +37,64 @@ const Login = () => {
                 if (data.user.role === 'admin') navigate('/admin/menu');
                 else if (data.user.role === 'staff') navigate('/staff/kitchen');
                 else navigate('/dashboard/menu');
+            } else if (res.status === 403 && data.requiresVerification) {
+                setUserId(data.userId);
+                setShowOtp(true);
+                setError('Please verify your email to continue.');
             } else {
                 setError(data.message || 'Login failed');
             }
         } catch (err) {
             setError('Server connection error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        try {
+            const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, otp })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                login(data.user);
+                navigate('/dashboard/menu');
+            } else {
+                setError(data.message || 'Verification failed');
+            }
+        } catch (err) {
+            setError('Server error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await fetch(`${API_URL}/api/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: credentialResponse.credential })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                login(data.user);
+                if (data.user.role === 'admin') navigate('/admin/menu');
+                else if (data.user.role === 'staff') navigate('/staff/kitchen');
+                else navigate('/dashboard/menu');
+            } else {
+                setError(data.message || 'Google Login failed');
+            }
+        } catch (err) {
+            setError('Google login failed');
         } finally {
             setLoading(false);
         }
@@ -282,56 +339,88 @@ const Login = () => {
                     }}>{error}</div>
                 )}
 
-                {/* Login Form */}
-                <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
-                        <input
-                            type="email"
-                            className="input-modern"
-                            placeholder="Email Address"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                        <div className="icon-wrapper">
-                            <Mail size={20} />
+                {!showOtp ? (
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
+                            <input
+                                type="email"
+                                className="input-modern"
+                                placeholder="Email Address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                            <div className="icon-wrapper">
+                                <Mail size={20} />
+                            </div>
                         </div>
-                    </div>
 
-                    <div style={{ marginBottom: '2rem', position: 'relative' }}>
-                        <input
-                            type="password"
-                            className="input-modern"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        <div className="icon-wrapper">
-                            <Lock size={20} />
+                        <div style={{ marginBottom: '2rem', position: 'relative' }}>
+                            <input
+                                type="password"
+                                className="input-modern"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <div className="icon-wrapper">
+                                <Lock size={20} />
+                            </div>
                         </div>
-                    </div>
 
-                    <button type="submit" className="btn-modern" disabled={loading}>
-                        {loading ? (
-                            <>
-                                <div style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    border: '3px solid rgba(255,255,255,0.3)',
-                                    borderTop: '3px solid white',
-                                    borderRadius: '50%',
-                                    animation: 'spin 0.8s linear infinite'
-                                }} />
-                                Logging in...
-                            </>
-                        ) : (
-                            <>
-                                Sign In <ArrowRight size={20} />
-                            </>
-                        )}
-                    </button>
-                </form>
+                        <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
+                            <a href="/forgot-password" style={{ color: '#E23744', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 500 }}>
+                                Forgot Password?
+                            </a>
+                        </div>
+
+                        <button type="submit" className="btn-modern" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <div style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        border: '3px solid rgba(255,255,255,0.3)',
+                                        borderTop: '3px solid white',
+                                        borderRadius: '50%',
+                                        animation: 'spin 0.8s linear infinite'
+                                    }} />
+                                    Logging in...
+                                </>
+                            ) : (
+                                <>
+                                    Sign In <ArrowRight size={20} />
+                                </>
+                            )}
+                        </button>
+                    </form>
+                ) : (
+                    <form onSubmit={handleVerifyOtp}>
+                        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                            <input
+                                type="text"
+                                className="input-modern"
+                                placeholder="6-digit Verification Code"
+                                maxLength="6"
+                                style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.5rem' }}
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="btn-modern" disabled={loading}>
+                            {loading ? 'Verifying...' : 'Verify & Sign In'} <ArrowRight size={20} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowOtp(false)}
+                            style={{ width: '100%', marginTop: '1rem', background: 'transparent', border: 'none', color: '#9CA3AF', cursor: 'pointer' }}
+                        >
+                            Back to Login
+                        </button>
+                    </form>
+                )}
 
                 {/* Divider */}
                 <div style={{
@@ -343,8 +432,18 @@ const Login = () => {
                     fontSize: '0.85rem'
                 }}>
                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-                    <span>New to Campus Bites?</span>
+                    <span>Or continue with</span>
                     <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => setError('Google Login Failed')}
+                        theme="dark"
+                        shape="pill"
+                        width="100%"
+                    />
                 </div>
 
                 {/* Register Link */}

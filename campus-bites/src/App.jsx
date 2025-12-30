@@ -14,6 +14,7 @@ import Profile from './pages/Profile'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import ManageMenu from './pages/admin/ManageMenu'
 import KitchenView from './pages/staff/KitchenView'
+import ForgotPassword from './pages/ForgotPassword'
 
 // Protected Route Component
 const ProtectedRoute = ({ children, roles }) => {
@@ -43,6 +44,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
 
                         {/* Student Dashboard */}
                         <Route path="/dashboard" element={

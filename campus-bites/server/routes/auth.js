@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const sendEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Register
 router.post('/register', async (req, res) => {
@@ -13,11 +17,70 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
         // Create new user (In production, hash password!)
-        const user = new User({ name, email, password });
+        const user = new User({
+            name,
+            email,
+            password,
+            otp,
+            otpExpires,
+            isVerified: false
+        });
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+        // Send Email
+        const message = `Your verification code is: ${otp}`;
+        try {
+            await sendEmail(email, 'Verify your account - Campus Bites', message, `<h1>Your OTP is ${otp}</h1>`);
+        } catch (emailError) {
+            console.error('Email send failed');
+            // Don't fail registration if email fails (for now), but usually we should.
+        }
+
+        res.status(201).json({ message: 'Registration successful. Please verify your email.', userId: user._id, requiresVerification: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+// Verify OTP
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { userId, email, otp } = req.body;
+
+        let user;
+        if (userId) {
+            user = await User.findById(userId);
+        } else if (email) {
+            user = await User.findOne({ email });
+        }
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        if (user.otpExpires < Date.now()) {
+            return res.status(400).json({ message: 'OTP expired' });
+        }
+
+        user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+
+        res.json({
+            message: 'Email verified successfully',
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+        });
+
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
@@ -39,9 +102,106 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
+        if (!user.isVerified) {
+            // Generate new OTP if verifying again? Or just block.
+            return res.status(403).json({ message: 'Please verify your email first', requiresVerification: true, userId: user._id });
+        }
+
         res.json({ message: 'Login successful', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+// Forgot Password
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user.resetPasswordOtp = otp;
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+        await user.save();
+
+        const message = `Your password reset code is: ${otp}`;
+        await sendEmail(email, 'Reset Password - Campus Bites', message, `<h1>Your Reset Code is ${otp}</h1>`);
+
+        res.json({ message: 'Reset code sent to email' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Reset Password
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await User.findOne({
+            email,
+            resetPasswordOtp: otp,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired OTP' });
+        }
+
+        user.password = newPassword; // Hash this in production!
+        user.resetPasswordOtp = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.json({ message: 'Password reset successful' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Google Login
+router.post('/google', async (req, res) => {
+    try {
+        const { credential } = req.body;
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const { email, name, picture, sub: googleId } = payload;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Create new Google user
+            user = new User({
+                name,
+                email,
+                password: crypto.randomBytes(16).toString('hex'), // Dummy password
+                isVerified: true, // Google users are verified
+                role: 'student'
+            });
+            await user.save();
+        } else {
+            // Ensure they are verified if they previously registered with email but same email
+            if (!user.isVerified) {
+                user.isVerified = true;
+                await user.save();
+            }
+        }
+
+        res.json({
+            message: 'Google login successful',
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
+        });
+
+    } catch (err) {
+        console.error('Google Auth Error:', err);
+        res.status(500).json({ message: 'Google authentication failed' });
     }
 });
 
