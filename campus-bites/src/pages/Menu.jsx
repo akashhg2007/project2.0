@@ -37,10 +37,10 @@ const Menu = () => {
     }, []);
 
     const categories = [
-        { name: 'All', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop' },
-        { name: 'Snacks', image: 'https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=100&h=100&fit=crop' },
-        { name: 'Meals', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop' },
-        { name: 'Beverages', image: 'https://images.unsplash.com/photo-1544145945-f904253db0ad?w=100&h=100&fit=crop' }
+        { name: 'All', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop' },
+        { name: 'Snacks', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200&h=200&fit=crop' },
+        { name: 'Meals', image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=200&h=200&fit=crop' },
+        { name: 'Beverages', image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200&h=200&fit=crop' }
     ];
 
     const filteredProducts = products.filter(p => {
@@ -93,11 +93,11 @@ const Menu = () => {
                 .product-card:active {
                     transform: scale(0.95);
                 }
-                .category-btn {
-                    transition: all 0.2s ease;
+                .category-item {
+                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 }
-                .category-btn:active {
-                    transform: scale(0.9);
+                .category-item:hover {
+                    transform: translateY(-5px);
                 }
             `}</style>
 
@@ -158,7 +158,8 @@ const Menu = () => {
                     alignItems: 'center',
                     gap: '0.75rem',
                     animation: 'slideInUp 0.6s ease-out',
-                    border: '1px solid rgba(255,255,255,0.15)'
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    marginBottom: '2rem'
                 }}>
                     <Search color="#9CA3AF" size={20} />
                     <input
@@ -183,42 +184,44 @@ const Menu = () => {
 
 
             {/* Aesthetic Category Selection */}
-            <div style={{ marginBottom: '2.5rem' }}>
+            <div style={{ marginBottom: '2.5rem', padding: '0 4px' }}>
                 <div style={{
                     display: 'flex',
-                    gap: '1.2rem',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
                     overflowX: 'auto',
-                    padding: '0.5rem 0.2rem 1.5rem',
+                    padding: '0.5rem 0.2rem 1rem',
                     scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                    scrollSnapType: 'x mandatory'
+                    msOverflowStyle: 'none'
                 }}>
                     {categories.map((cat, idx) => (
                         <div
                             key={cat.name}
                             onClick={() => setCategory(cat.name)}
+                            className="category-item"
                             style={{
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                gap: '10px',
+                                gap: '12px',
                                 cursor: 'pointer',
-                                scrollSnapAlign: 'start',
                                 animation: `fadeIn 0.5s ease-out ${idx * 0.1}s forwards`,
-                                opacity: 0
+                                opacity: 0,
+                                minWidth: '70px'
                             }}
                         >
                             {/* Image Circle */}
                             <div style={{
-                                width: '70px',
-                                height: '70px',
+                                width: '68px',
+                                height: '68px',
                                 borderRadius: '50%',
                                 padding: '3px',
-                                border: category === cat.name ? '3px solid #E23744' : '2px solid rgba(255,255,255,0.1)',
-                                background: category === cat.name ? 'rgba(226, 55, 68, 0.2)' : 'transparent',
+                                border: category === cat.name ? '3px solid #E23744' : '2px solid rgba(255,255,255,0.08)',
+                                background: category === cat.name ? 'rgba(226, 55, 68, 0.2)' : 'rgba(255,255,255,0.03)',
                                 transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                                transform: category === cat.name ? 'scale(1.15)' : 'scale(1)',
-                                boxShadow: category === cat.name ? '0 0 20px rgba(226, 55, 68, 0.4)' : 'none'
+                                transform: category === cat.name ? 'scale(1.1)' : 'scale(1)',
+                                boxShadow: category === cat.name ? '0 8px 15px rgba(226, 55, 68, 0.3)' : 'none',
+                                overflow: 'hidden'
                             }}>
                                 <img
                                     src={cat.image}
@@ -228,16 +231,18 @@ const Menu = () => {
                                         height: '100%',
                                         borderRadius: '50%',
                                         objectFit: 'cover',
-                                        filter: category === cat.name ? 'grayscale(0)' : 'grayscale(0.4)'
+                                        transition: 'all 0.5s ease',
+                                        filter: category === cat.name ? 'brightness(1.1) saturate(1.1)' : 'brightness(0.8) grayscale(0.2)'
                                     }}
                                 />
                             </div>
                             {/* Text label */}
                             <span style={{
-                                fontSize: '0.8rem',
-                                fontWeight: category === cat.name ? 800 : 600,
+                                fontSize: '0.85rem',
+                                fontWeight: category === cat.name ? 800 : 500,
                                 color: category === cat.name ? '#E23744' : '#9CA3AF',
-                                transition: 'all 0.3s ease'
+                                transition: 'all 0.3s ease',
+                                letterSpacing: '0.2px'
                             }}>
                                 {cat.name}
                             </span>
