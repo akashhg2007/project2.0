@@ -409,7 +409,7 @@ const Cart = () => {
                     <div style={{ marginBottom: '1rem' }}>
                         <p style={{ fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '0.75rem' }}>Quick Select</p>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                            {['12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM'].map(time => (
+                            {['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM', '06:30 PM'].map(time => (
                                 <button
                                     key={time}
                                     onClick={() => setPickupTime(time)}
@@ -475,7 +475,7 @@ const Cart = () => {
                         marginTop: '1rem',
                         textAlign: 'center'
                     }}>
-                        Orders can be placed 30 minutes to 6 hours in advance
+                        Pickup available during college hours: 07:00 AM - 07:00 PM
                     </p>
                 </div>
             </div>
