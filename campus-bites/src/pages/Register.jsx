@@ -260,7 +260,7 @@ const Register = () => {
                         </div>
 
                         <button type="submit" className="btn-modern" disabled={loading}>
-                            {loading ? 'Sending Code...' : 'Get Verified'} <ArrowRight size={20} />
+                            {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} />
                         </button>
                     </form>
                 ) : (

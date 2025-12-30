@@ -41,7 +41,11 @@ router.post('/register', async (req, res) => {
             // Don't fail registration if email fails (for now), but usually we should.
         }
 
-        res.status(201).json({ message: 'Registration successful. Please verify your email.', userId: user._id, requiresVerification: true });
+        res.status(201).json({
+            message: 'Registration successful',
+            user: { id: user._id, name: user.name, email: user.email, role: user.role },
+            requiresVerification: false
+        });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
@@ -102,10 +106,9 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        if (!user.isVerified) {
-            // Generate new OTP if verifying again? Or just block.
-            return res.status(403).json({ message: 'Please verify your email first', requiresVerification: true, userId: user._id });
-        }
+        // if (!user.isVerified) {
+        //     return res.status(403).json({ message: 'Please verify your email first', requiresVerification: true, userId: user._id });
+        // }
 
         res.json({ message: 'Login successful', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (err) {

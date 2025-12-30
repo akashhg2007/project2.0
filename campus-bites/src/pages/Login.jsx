@@ -37,10 +37,6 @@ const Login = () => {
                 if (data.user.role === 'admin') navigate('/admin/menu');
                 else if (data.user.role === 'staff') navigate('/staff/kitchen');
                 else navigate('/dashboard/menu');
-            } else if (res.status === 403 && data.requiresVerification) {
-                setUserId(data.userId);
-                setShowOtp(true);
-                setError('Please verify your email to continue.');
             } else {
                 setError(data.message || 'Login failed');
             }
