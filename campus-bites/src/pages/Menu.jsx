@@ -99,25 +99,6 @@ const Menu = () => {
                 .category-btn:active {
                     transform: scale(0.9);
                 }
-                .hero-banner {
-                    background: linear-gradient(135deg, rgba(226, 55, 68, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
-                    border: 1px solid rgba(226, 55, 68, 0.3);
-                    border-radius: 24px;
-                    padding: 1.5rem;
-                    margin-bottom: 2rem;
-                    position: relative;
-                    overflow: hidden;
-                    animation: fadeIn 1s ease-out;
-                }
-                .hero-banner::after {
-                    content: '';
-                    position: absolute;
-                    top: 0; left: 0; right: 0; bottom: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-                    background-size: 200% 100%;
-                    animation: shimmer 3s infinite linear;
-                    pointer-events: none;
-                }
             `}</style>
 
             {/* Header / Hero */}
@@ -170,20 +151,6 @@ const Menu = () => {
                 </div>
             </div>
 
-            {/* Special Promo Banner */}
-            <div className="hero-banner">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                            <Sparkles size={16} color="#F59E0B" />
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F59E0B', textTransform: 'uppercase' }}>Limited Offer</span>
-                        </div>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '4px' }}>Free Chai with Snacks</h3>
-                        <p style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>Orders above ₹50 | Valid till 4 PM</p>
-                    </div>
-                    <div style={{ fontSize: '3rem', opacity: 0.8 }}>🫖</div>
-                </div>
-            </div>
 
             {/* Categories */}
             <div style={{ marginBottom: '2rem' }}>
