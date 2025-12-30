@@ -432,34 +432,16 @@ const Cart = () => {
                     </div>
 
                     {/* Manual Time Input */}
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                            <p style={{ fontSize: '0.85rem', color: '#9CA3AF' }}>Or Enter Manually</p>
-                            {pickupTime && (
-                                <span style={{
-                                    fontSize: '0.75rem',
-                                    fontWeight: 700,
-                                    color: '#E23744',
-                                    background: 'rgba(226, 55, 68, 0.1)',
-                                    padding: '2px 8px',
-                                    borderRadius: '6px',
-                                    animation: 'fadeIn 0.3s ease-out'
-                                }}>
-                                    {(() => {
-                                        const [timePart, modifier] = pickupTime.split(' ');
-                                        let [hours] = timePart.split(':').map(Number);
-                                        if (modifier === 'PM' && hours !== 12) hours += 12;
-                                        if (modifier === 'AM' && hours === 12) hours = 0;
-
-                                        if (hours >= 5 && hours < 12) return 'Morning 🌅';
-                                        if (hours >= 12 && hours < 17) return 'Afternoon ☀️';
-                                        if (hours >= 17 && hours < 21) return 'Evening 🌆';
-                                        return 'Night 🌙';
-                                    })()}
-                                </span>
-                            )}
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.5rem' }}>
+                        <p style={{ fontSize: '0.85rem', color: '#9CA3AF', marginBottom: '1rem' }}>Or set a custom time</p>
+                        <div style={{
+                            display: 'flex',
+                            gap: '12px',
+                            alignItems: 'center',
+                            background: 'rgba(255,255,255,0.02)',
+                            padding: '4px 12px',
+                            borderRadius: '16px'
+                        }}>
                             <input
                                 type="time"
                                 onChange={(e) => {
@@ -473,22 +455,22 @@ const Cart = () => {
                                 }}
                                 style={{
                                     flex: 1,
-                                    padding: '0.75rem',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: '12px',
+                                    padding: '0.6rem 0',
+                                    background: 'transparent',
+                                    border: 'none',
                                     color: 'white',
-                                    fontSize: '0.95rem',
-                                    outline: 'none'
+                                    fontSize: '1rem',
+                                    fontWeight: 600,
+                                    outline: 'none',
+                                    cursor: 'pointer'
                                 }}
                             />
                             <div style={{
-                                padding: '0.75rem',
-                                background: 'rgba(226, 55, 68, 0.1)',
-                                borderRadius: '12px',
-                                border: '1px solid rgba(226, 55, 68, 0.3)'
+                                padding: '8px',
+                                background: 'rgba(255,255,255,0.05)',
+                                borderRadius: '10px',
                             }}>
-                                <Clock size={20} color="#E23744" />
+                                <Clock size={16} color="#9CA3AF" />
                             </div>
                         </div>
                     </div>
