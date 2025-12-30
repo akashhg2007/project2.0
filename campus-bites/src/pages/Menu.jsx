@@ -120,6 +120,51 @@ const Menu = () => {
                     Hungry, <span style={{ color: '#E23744' }}>{user?.name?.split(' ')[0] || 'Peer'}?</span> 😋
                 </h1>
 
+                {/* Visual Hero Banner */}
+                <div style={{
+                    position: 'relative',
+                    height: '200px',
+                    borderRadius: '24px',
+                    overflow: 'hidden',
+                    marginBottom: '2rem',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                    animation: 'fadeIn 0.8s ease-out'
+                }}>
+                    <img
+                        src="/hero_food_banner.png"
+                        alt="Featured Food"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        padding: '1.5rem'
+                    }}>
+                        <h2 style={{
+                            fontSize: '1.8rem',
+                            fontWeight: 800,
+                            color: 'white',
+                            marginBottom: '10px',
+                            maxWidth: '220px',
+                            lineHeight: '1.2'
+                        }}>
+                            Order your favourite food here
+                        </h2>
+                        <p style={{
+                            fontSize: '0.8rem',
+                            color: '#9CA3AF',
+                            maxWidth: '280px',
+                            lineHeight: '1.4'
+                        }}>
+                            Delicious meals from your campus canteen, prepared fresh and delivered hot.
+                        </p>
+                    </div>
+                </div>
+
                 {/* Search Omni-bar */}
                 <div className="glass-panel" style={{
                     borderRadius: '20px',
