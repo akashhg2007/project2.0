@@ -285,12 +285,7 @@ const Menu = () => {
                 ))}
             </div>
 
-            {/* Bottom Info */}
-            <div style={{ marginTop: '3rem', textAlign: 'center', padding: '2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <ChefHat size={32} color="#E23744" style={{ margin: '0 auto 1rem' }} />
-                <h4 style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Hygiene Guaranteed</h4>
-                <p style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>Our kitchen follows all COVID-19 safety protocols.</p>
-            </div>
+
         </div>
     );
 };
