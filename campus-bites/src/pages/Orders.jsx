@@ -104,6 +104,12 @@ const Orders = () => {
         }
     };
 
+    const activeOrders = orders.filter(o => ['pending', 'preparing', 'ready'].includes(o.status));
+    const pastOrders = orders.filter(o => ['completed', 'cancelled'].includes(o.status));
+
+    const [activeTab, setActiveTab] = useState('active'); // 'active' or 'past'
+    const displayedOrders = activeTab === 'active' ? activeOrders : pastOrders;
+
     if (loading) return (
         <div style={{
             minHeight: '80vh',
@@ -126,9 +132,9 @@ const Orders = () => {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-                @keyframes pulse-soft {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.6; }
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
                 }
                 .order-card {
                     animation: slideUp 0.5s ease-out;
@@ -152,6 +158,29 @@ const Orders = () => {
                     transform: rotate(180deg);
                     color: #E23744;
                 }
+                .tab-btn {
+                    padding: 0.75rem 1.5rem;
+                    border: none;
+                    background: transparent;
+                    color: #9CA3AF;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    border-radius: 12px;
+                    font-size: 0.95rem;
+                }
+                .tab-btn.active {
+                    color: white;
+                    background: rgba(255, 255, 255, 0.05);
+                }
+                .tab-indicator {
+                    position: absolute;
+                    bottom: 0;
+                    height: 2px;
+                    background: #E23744;
+                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    border-radius: 2px;
+                }
             `}</style>
 
             {/* Header */}
@@ -159,7 +188,7 @@ const Orders = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '2rem'
+                marginBottom: '1.5rem'
             }}>
                 <div>
                     <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>Your Orders</h1>
@@ -182,17 +211,58 @@ const Orders = () => {
                 </button>
             </div>
 
-            {orders.length === 0 ? (
+            {/* Tabs */}
+            <div style={{
+                display: 'flex',
+                background: 'rgba(255,255,255,0.02)',
+                padding: '6px',
+                borderRadius: '16px',
+                marginBottom: '2rem',
+                position: 'relative'
+            }}>
+                <button
+                    className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('active')}
+                    style={{ flex: 1 }}
+                >
+                    Current Orders ({activeOrders.length})
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'past' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('past')}
+                    style={{ flex: 1 }}
+                >
+                    Order History ({pastOrders.length})
+                </button>
+                <div style={{
+                    position: 'absolute',
+                    bottom: '6px',
+                    left: activeTab === 'active' ? '6px' : 'calc(50% + 3px)',
+                    width: 'calc(50% - 9px)',
+                    height: '2px',
+                    background: '#E23744',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }} />
+            </div>
+
+            {displayedOrders.length === 0 ? (
                 <div style={{
                     textAlign: 'center',
                     padding: '4rem 2rem',
                     background: 'rgba(255,255,255,0.03)',
                     borderRadius: '24px',
-                    border: '1px dashed rgba(255,255,255,0.1)'
+                    border: '1px dashed rgba(255,255,255,0.1)',
+                    animation: 'fadeIn 0.5s ease-out'
                 }}>
                     <ShoppingBag size={48} color="#E23744" style={{ marginBottom: '1rem', opacity: 0.5 }} />
-                    <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>No orders yet</h3>
-                    <p style={{ color: '#9CA3AF', marginBottom: '2rem' }}>Looks like you haven't ordered anything yet.</p>
+                    <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>
+                        {activeTab === 'active' ? 'No active orders' : 'No order history'}
+                    </h3>
+                    <p style={{ color: '#9CA3AF', marginBottom: '2rem' }}>
+                        {activeTab === 'active'
+                            ? "You don't have any ongoing orders at the moment."
+                            : "Your order history is empty."}
+                    </p>
                     <button
                         onClick={() => navigate('/dashboard/menu')}
                         style={{
@@ -210,7 +280,7 @@ const Orders = () => {
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {orders.map((order, idx) => {
+                    {displayedOrders.map((order, idx) => {
                         const status = getStatusConfig(order.status);
                         const StatusIcon = status.icon;
                         const date = new Date(order.createdAt);
