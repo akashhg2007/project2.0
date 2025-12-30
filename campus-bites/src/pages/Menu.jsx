@@ -37,10 +37,10 @@ const Menu = () => {
     }, []);
 
     const categories = [
-        { name: 'All', emoji: '🍽️' },
-        { name: 'Snacks', emoji: '🍔' },
-        { name: 'Meals', emoji: '🍛' },
-        { name: 'Beverages', emoji: '🥤' }
+        { name: 'All', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop' },
+        { name: 'Snacks', image: 'https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=100&h=100&fit=crop' },
+        { name: 'Meals', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop' },
+        { name: 'Beverages', image: 'https://images.unsplash.com/photo-1544145945-f904253db0ad?w=100&h=100&fit=crop' }
     ];
 
     const filteredProducts = products.filter(p => {
@@ -182,40 +182,66 @@ const Menu = () => {
             </div>
 
 
-            {/* Categories */}
-            <div style={{ marginBottom: '2rem' }}>
+            {/* Aesthetic Category Selection */}
+            <div style={{ marginBottom: '2.5rem' }}>
                 <div style={{
                     display: 'flex',
-                    gap: '0.75rem',
+                    gap: '1.2rem',
                     overflowX: 'auto',
-                    paddingBottom: '0.5rem',
+                    padding: '0.5rem 0.2rem 1.5rem',
                     scrollbarWidth: 'none',
-                    msOverflowStyle: 'none'
+                    msOverflowStyle: 'none',
+                    scrollSnapType: 'x mandatory'
                 }}>
                     {categories.map((cat, idx) => (
-                        <button
+                        <div
                             key={cat.name}
                             onClick={() => setCategory(cat.name)}
-                            className="category-btn"
                             style={{
-                                padding: '0.6rem 1.2rem',
-                                borderRadius: '100px',
-                                border: category === cat.name ? '2px solid #E23744' : '1px solid rgba(255,255,255,0.1)',
-                                background: category === cat.name ? 'rgba(226, 55, 68, 0.15)' : 'rgba(255,255,255,0.05)',
-                                color: category === cat.name ? '#E23744' : 'white',
-                                fontSize: '0.85rem',
-                                fontWeight: 700,
-                                whiteSpace: 'nowrap',
-                                animation: `fadeIn 0.5s ease-out ${idx * 0.1}s forwards`,
-                                opacity: 0,
                                 display: 'flex',
+                                flexDirection: 'column',
                                 alignItems: 'center',
-                                gap: '8px'
+                                gap: '10px',
+                                cursor: 'pointer',
+                                scrollSnapAlign: 'start',
+                                animation: `fadeIn 0.5s ease-out ${idx * 0.1}s forwards`,
+                                opacity: 0
                             }}
                         >
-                            <span>{cat.emoji}</span>
-                            {cat.name}
-                        </button>
+                            {/* Image Circle */}
+                            <div style={{
+                                width: '70px',
+                                height: '70px',
+                                borderRadius: '50%',
+                                padding: '3px',
+                                border: category === cat.name ? '3px solid #E23744' : '2px solid rgba(255,255,255,0.1)',
+                                background: category === cat.name ? 'rgba(226, 55, 68, 0.2)' : 'transparent',
+                                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                transform: category === cat.name ? 'scale(1.15)' : 'scale(1)',
+                                boxShadow: category === cat.name ? '0 0 20px rgba(226, 55, 68, 0.4)' : 'none'
+                            }}>
+                                <img
+                                    src={cat.image}
+                                    alt={cat.name}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                        filter: category === cat.name ? 'grayscale(0)' : 'grayscale(0.4)'
+                                    }}
+                                />
+                            </div>
+                            {/* Text label */}
+                            <span style={{
+                                fontSize: '0.8rem',
+                                fontWeight: category === cat.name ? 800 : 600,
+                                color: category === cat.name ? '#E23744' : '#9CA3AF',
+                                transition: 'all 0.3s ease'
+                            }}>
+                                {cat.name}
+                            </span>
+                        </div>
                     ))}
                 </div>
             </div>
