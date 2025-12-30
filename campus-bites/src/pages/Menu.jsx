@@ -102,23 +102,8 @@ const Menu = () => {
             `}</style>
 
             {/* Header / Hero */}
-            <div style={{ paddingTop: '2.5rem', marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Clock size={14} color="#E23744" />
-                        <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Canteen Open</span>
-                    </div>
-                </div>
+            <div style={{ paddingTop: '2.5rem' }}>
 
-                <h1 style={{
-                    fontSize: '2.2rem',
-                    fontWeight: 800,
-                    marginBottom: '1.5rem',
-                    color: 'white',
-                    animation: 'slideInUp 0.5s ease-out'
-                }}>
-                    Hungry, <span style={{ color: '#E23744' }}>{user?.name?.split(' ')[0] || 'Peer'}?</span> 😋
-                </h1>
 
                 {/* Visual Hero Banner */}
                 <div style={{
