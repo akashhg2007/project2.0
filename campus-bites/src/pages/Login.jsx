@@ -420,7 +420,8 @@ const Login = () => {
                     </form>
                 )}
 
-                {/* Divider */}
+                {/* Google Login removed for now */}
+                {/* 
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -443,6 +444,7 @@ const Login = () => {
                         width="100%"
                     />
                 </div>
+                */}
 
                 {/* Register Link */}
                 <a href="/register" style={{
