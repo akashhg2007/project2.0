@@ -49,7 +49,13 @@ mongoose.connect(mongoURI, {
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('Campus Bites API is running');
+    const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
+    res.json({
+        message: 'Campus Bites API is running',
+        dbStatus,
+        env: process.env.NODE_ENV,
+        timestamp: new Date()
+    });
 });
 
 const authRoutes = require('./routes/auth');

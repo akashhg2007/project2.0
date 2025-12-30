@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Product = require('../models/Product');
 const { verifyUser, checkRole } = require('../middleware/auth');
@@ -6,6 +7,9 @@ const { verifyUser, checkRole } = require('../middleware/auth');
 // Get all products (Public)
 router.get('/', async (req, res) => {
     try {
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({ message: 'Database not connected' });
+        }
         const { category } = req.query;
         let query = {};
         if (category && category !== 'All') {
