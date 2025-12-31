@@ -138,7 +138,7 @@ const ManageMenu = () => {
                     align-items: center;
                     justify-content: center;
                     z-index: 1000;
-                    padding: 2rem;
+                    padding: 1.5rem;
                 }
                 .action-btn {
                     padding: 0.5rem;
@@ -157,15 +157,45 @@ const ManageMenu = () => {
                     color: #F87171;
                     background: rgba(248, 113, 113, 0.1);
                 }
+                
+                @media (max-width: 768px) {
+                    .admin-table thead { display: none; }
+                    .table-row { 
+                        display: block; 
+                        margin-bottom: 1.5rem; 
+                        padding: 1rem; 
+                        border-radius: 16px !important;
+                    }
+                    .table-row td { 
+                        display: flex; 
+                        justify-content: space-between; 
+                        align-items: center; 
+                        padding: 0.75rem 0.5rem;
+                        border: none !important;
+                    }
+                    .table-row td::before {
+                        content: attr(data-label);
+                        font-size: 0.7rem;
+                        color: #6B7280;
+                        text-transform: uppercase;
+                        font-weight: 700;
+                    }
+                    .header-bar { flex-direction: column; align-items: flex-start !important; gap: 1.5rem; }
+                    .header-bar h1 { font-size: 1.5rem !important; }
+                    .add-btn { width: 100%; justify-content: center; }
+                    .modal-content { padding: 1.5rem !important; }
+                    .form-grid { flex-direction: column !important; gap: 1.5rem !important; }
+                }
             `}</style>
 
             {/* Header Action Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <div className="header-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>Menu Management</h1>
-                    <p style={{ color: '#6B7280', margin: '4px 0 0 0' }}>Manage items, prices, and availability</p>
+                    <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>Menu</h1>
+                    <p style={{ color: '#6B7280', margin: '4px 0 0 0' }}>Manage items & prices</p>
                 </div>
                 <button
+                    className="add-btn"
                     onClick={() => handleOpenModal()}
                     style={{
                         background: '#E23744',
@@ -181,16 +211,16 @@ const ManageMenu = () => {
                         boxShadow: '0 8px 20px rgba(226, 55, 68, 0.3)'
                     }}
                 >
-                    <Plus size={20} /> Add New Item
+                    <Plus size={20} /> Add Item
                 </button>
             </div>
 
             {/* Table Area */}
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'hidden' }}>
                 <table className="admin-table">
                     <thead>
                         <tr>
-                            <th style={{ textAlign: 'left' }}>Item Details</th>
+                            <th style={{ textAlign: 'left' }}>Item</th>
                             <th style={{ textAlign: 'left' }}>Category</th>
                             <th style={{ textAlign: 'left' }}>Price</th>
                             <th style={{ textAlign: 'left' }}>Status</th>
@@ -200,42 +230,41 @@ const ManageMenu = () => {
                     <tbody>
                         {products.map(product => (
                             <tr key={product._id} className="table-row">
-                                <td>
+                                <td data-label="Item">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                        <div style={{ width: '50px', height: '50px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                                        <div style={{ width: '45px', height: '45px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden', flexShrink: 0 }}>
                                             {product.image ? (
                                                 <img src={product.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             ) : (
                                                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#374151' }}>
-                                                    <ImageIcon size={20} />
+                                                    <ImageIcon size={18} />
                                                 </div>
                                             )}
                                         </div>
-                                        <div>
-                                            <div style={{ fontWeight: 700, fontSize: '1rem' }}>{product.name}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#6B7280', marginTop: '2px' }}>{product.category}</div>
+                                        <div style={{ overflow: 'hidden' }}>
+                                            <div style={{ fontWeight: 700, fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.name}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>{product.category}</td>
-                                <td style={{ fontWeight: 800, fontSize: '1.1rem' }}>₹{product.price}</td>
-                                <td>
+                                <td data-label="Category">{product.category}</td>
+                                <td data-label="Price" style={{ fontWeight: 800, fontSize: '1.05rem' }}>₹{product.price}</td>
+                                <td data-label="Status">
                                     <div style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '6px',
                                         color: product.isAvailable ? '#22C55E' : '#9CA3AF',
-                                        fontSize: '0.9rem',
+                                        fontSize: '0.85rem',
                                         fontWeight: 600
                                     }}>
-                                        {product.isAvailable ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                                        {product.isAvailable ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
                                         {product.isAvailable ? 'Live' : 'Hidden'}
                                     </div>
                                 </td>
-                                <td style={{ textAlign: 'right' }}>
+                                <td data-label="Actions" style={{ textAlign: 'right' }}>
                                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                        <button className="action-btn" onClick={() => handleOpenModal(product)} title="Edit"><Edit2 size={18} /></button>
-                                        <button className="action-btn delete" onClick={() => handleDelete(product._id)} title="Delete"><Trash2 size={18} /></button>
+                                        <button className="action-btn" onClick={() => handleOpenModal(product)} title="Edit"><Edit2 size={16} /></button>
+                                        <button className="action-btn delete" onClick={() => handleDelete(product._id)} title="Delete"><Trash2 size={16} /></button>
                                     </div>
                                 </td>
                             </tr>
@@ -247,25 +276,25 @@ const ManageMenu = () => {
             {/* Modal */}
             {isModalOpen && (
                 <div className="modal-overlay">
-                    <div className="glass-card" style={{ width: '100%', maxWidth: '550px', padding: '2.5rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{editingProduct ? 'Edit Menu Item' : 'New Menu Item'}</h2>
-                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'transparent', border: 'none', color: '#6B7280', cursor: 'pointer' }}><XCircle size={24} /></button>
+                    <div className="glass-card modal-content" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0 }}>{editingProduct ? 'Edit Item' : 'New Item'}</h2>
+                            <button onClick={() => setIsModalOpen(false)} style={{ background: 'transparent', border: 'none', color: '#6B7280', cursor: 'pointer' }}><XCircle size={20} /></button>
                         </div>
 
                         <form onSubmit={handleSubmit}>
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase' }}>Item Name</label>
-                                <input required className="input-field-dark" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Spicy Paneer Roll" />
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>Item Name</label>
+                                <input required className="input-field-dark" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="Item Name" />
                             </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div className="form-grid" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                                 <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase' }}>Price (₹)</label>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>Price (₹)</label>
                                     <input required type="number" className="input-field-dark" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} placeholder="99" />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase' }}>Category</label>
+                                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>Category</label>
                                     <select className="input-field-dark" style={{ appearance: 'none' }} value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
                                         <option>Snacks</option>
                                         <option>Meals</option>
@@ -276,32 +305,32 @@ const ManageMenu = () => {
                                 </div>
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase' }}>Description</label>
-                                <textarea className="input-field-dark" rows="3" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="What's inside this delicious dish?" />
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>Description</label>
+                                <textarea className="input-field-dark" rows="3" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} placeholder="Item description..." />
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase' }}>Image Source URL</label>
-                                <input className="input-field-dark" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} placeholder="https://images..." />
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>Image URL</label>
+                                <input className="input-field-dark" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} placeholder="https://..." />
                             </div>
 
-                            <div style={{ marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <input
                                     type="checkbox"
                                     id="available"
                                     checked={formData.isAvailable}
                                     onChange={e => setFormData({ ...formData, isAvailable: e.target.checked })}
-                                    style={{ width: '20px', height: '20px', accentColor: '#E23744', cursor: 'pointer' }}
+                                    style={{ width: '18px', height: '18px', accentColor: '#E23744', cursor: 'pointer' }}
                                 />
-                                <label htmlFor="available" style={{ cursor: 'pointer', fontWeight: 600 }}>Available for order</label>
+                                <label htmlFor="available" style={{ cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}>Available</label>
                             </div>
 
                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Discard</button>
+                                <button type="button" onClick={() => setIsModalOpen(false)} style={{ flex: 1, padding: '0.8rem', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', fontWeight: 700, cursor: 'pointer' }}>Discard</button>
                                 <button type="submit" disabled={loading} style={{
                                     flex: 2,
-                                    padding: '1rem',
+                                    padding: '0.8rem',
                                     borderRadius: '12px',
                                     background: '#E23744',
                                     color: 'white',
@@ -310,7 +339,7 @@ const ManageMenu = () => {
                                     cursor: 'pointer',
                                     boxShadow: '0 8px 20px rgba(226, 55, 68, 0.3)'
                                 }}>
-                                    {loading ? 'Processing...' : (editingProduct ? 'Commit Changes' : 'Publish Item')}
+                                    {loading ? '...' : (editingProduct ? 'Update' : 'Publish')}
                                 </button>
                             </div>
                         </form>

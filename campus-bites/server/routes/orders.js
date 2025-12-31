@@ -40,14 +40,18 @@ router.get('/mine', verifyUser, async (req, res) => {
     }
 });
 
-// Get Active Orders (Staff/Admin)
+// Get Active & Recently Completed Orders (Staff/Admin)
 router.get('/staff/active', verifyUser, checkRole(['admin', 'staff']), async (req, res) => {
     try {
-        // Active = not completed or cancelled
-        const orders = await Order.find({ status: { $nin: ['completed', 'cancelled'] } })
+        // Fetch all orders that are NOT cancelled
+        // This includes pending, preparing, ready, and completed (til 24h TTL deletion)
+        const orders = await Order.find({
+            status: { $ne: 'cancelled' }
+        })
             .populate('items.product')
             .populate('user', 'name')
-            .sort({ createdAt: 1 }); // Oldest first
+            .sort({ createdAt: -1 }); // Newest first for easier history tracking
+
         res.json(orders);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching active orders', error: err.message });
@@ -58,7 +62,17 @@ router.get('/staff/active', verifyUser, checkRole(['admin', 'staff']), async (re
 router.put('/:id/status', verifyUser, checkRole(['admin', 'staff']), async (req, res) => {
     try {
         const { status } = req.body;
-        const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        let update = { $set: { status } };
+
+        // If status is completed, set it to expire in 24 hours
+        if (status === 'completed') {
+            update.$set.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        } else {
+            // If moved away from completed (e.g. error correction), remove expiry
+            update.$unset = { expiresAt: "" };
+        }
+
+        const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
         res.json(order);
     } catch (err) {
         res.status(500).json({ message: 'Error updating order status', error: err.message });

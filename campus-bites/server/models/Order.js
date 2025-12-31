@@ -9,7 +9,10 @@ const OrderSchema = new mongoose.Schema({
     }],
     totalAmount: { type: Number, required: true },
     status: { type: String, enum: ['pending', 'preparing', 'ready', 'completed', 'cancelled'], default: 'pending' },
-    pickupTime: { type: String }
+    pickupTime: { type: String },
+    expiresAt: { type: Date } // For TIL deletion
 }, { timestamps: true });
+
+OrderSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('Order', OrderSchema);

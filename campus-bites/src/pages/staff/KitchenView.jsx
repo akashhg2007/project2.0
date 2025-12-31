@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, RefreshCw, Clock, ChefHat } from 'lucide-react';
+import { LogOut, RefreshCw, Clock, ChefHat, CheckCircle2, Flame, Inbox, PackageCheck } from 'lucide-react';
 
 import API_URL from '../../apiConfig';
 
@@ -49,10 +49,99 @@ const KitchenView = () => {
         total: orders.length,
         pending: orders.filter(o => o.status === 'pending').length,
         preparing: orders.filter(o => o.status === 'preparing').length,
-        ready: orders.filter(o => o.status === 'ready').length
+        ready: orders.filter(o => o.status === 'ready').length,
+        completed: orders.filter(o => o.status === 'completed').length
     };
 
     const filteredOrders = filter === 'All' ? orders : orders.filter(o => o.status === filter.toLowerCase());
+
+    const OrderCard = ({ order }) => (
+        <div key={order._id} className="glass-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <div>
+                    <p style={{ fontSize: '0.7rem', color: '#6B7280', margin: '0 0 2px 0', letterSpacing: '1px', fontWeight: 700 }}>ORDER TICKET</p>
+                    <p style={{ fontWeight: 800, fontSize: '1.25rem', color: 'white', margin: 0 }}>#{order._id.slice(-6).toUpperCase()}</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '0.7rem', color: '#6B7280', margin: '0 0 2px 0', letterSpacing: '1px', fontWeight: 700 }}>PICKUP TIME</p>
+                    <p style={{ fontWeight: 700, color: '#E23744', margin: 0, fontSize: '1.1rem' }}>
+                        <Clock size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
+                        {order.pickupTime || new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                </div>
+            </div>
+
+            <div style={{ marginBottom: '2rem', minHeight: '80px' }}>
+                <p style={{ fontSize: '0.75rem', color: '#9CA3AF', marginBottom: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Customer: {order.user?.name || 'Guest'}</p>
+                {order.items.map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0.75rem' }}>
+                        <div style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '8px',
+                            background: 'rgba(226, 55, 68, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.9rem',
+                            fontWeight: 800,
+                            color: '#E23744',
+                            border: '1px solid rgba(226, 55, 68, 0.2)'
+                        }}>
+                            {item.quantity}
+                        </div>
+                        <span style={{ color: '#E5E7EB', fontWeight: 500, fontSize: '1.05rem' }}>{item.product?.name || 'Item Expired'}</span>
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ marginTop: 'auto' }}>
+                {order.status === 'pending' && (
+                    <button
+                        onClick={() => updateStatus(order._id, 'preparing')}
+                        className="btn-action"
+                        style={{ backgroundColor: '#E23744', color: 'white', width: '100%', boxShadow: '0 8px 20px rgba(226, 55, 68, 0.2)' }}
+                    >
+                        Accept & Start Preparing
+                    </button>
+                )}
+                {order.status === 'preparing' && (
+                    <button
+                        onClick={() => updateStatus(order._id, 'ready')}
+                        className="btn-action"
+                        style={{ backgroundColor: '#F59E0B', color: 'white', width: '100%', boxShadow: '0 8px 20px rgba(245, 158, 11, 0.2)' }}
+                    >
+                        Mark as Ready to Pickup
+                    </button>
+                )}
+                {order.status === 'ready' && (
+                    <button
+                        onClick={() => updateStatus(order._id, 'completed')}
+                        className="btn-action"
+                        style={{ backgroundColor: '#22C55E', color: 'white', width: '100%', boxShadow: '0 8px 20px rgba(34, 197, 94, 0.2)' }}
+                    >
+                        Handover & Complete
+                    </button>
+                )}
+                {order.status === 'completed' && (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '0.8rem',
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        borderRadius: '12px',
+                        color: '#22C55E',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                    }}>
+                        <CheckCircle2 size={18} /> Completed Today
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#0D0D0D', color: 'white', position: 'relative', overflowX: 'hidden' }}>
@@ -78,6 +167,8 @@ const KitchenView = () => {
                     transition: all 0.3s ease;
                     position: relative;
                     z-index: 10;
+                    display: flex;
+                    flex-direction: column;
                 }
                 .glass-card:hover {
                     border-color: rgba(226, 55, 68, 0.3);
@@ -112,9 +203,6 @@ const KitchenView = () => {
                     filter: brightness(1.1);
                     transform: scale(1.02);
                 }
-                .btn-action:active {
-                    transform: scale(0.98);
-                }
                 .filter-pill {
                     padding: 0.6rem 1.5rem;
                     border-radius: 12px;
@@ -122,12 +210,47 @@ const KitchenView = () => {
                     cursor: pointer;
                     font-weight: 600;
                     transition: all 0.3s ease;
+                    white-space: nowrap;
                 }
-                /* Custom Scrollbar */
-                ::-webkit-scrollbar { width: 8px; }
-                ::-webkit-scrollbar-track { background: #0D0D0D; }
-                ::-webkit-scrollbar-thumb { background: #1C1C1E; border-radius: 10px; }
-                ::-webkit-scrollbar-thumb:hover { background: #2C2C2E; }
+                .section-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    font-size: 1.25rem;
+                    font-weight: 800;
+                    margin: 3rem 0 1.5rem 0;
+                    color: white;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .orders-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+                    gap: 2rem;
+                }
+                .stats-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                    gap: 1.5rem;
+                    marginBottom: 3rem;
+                }
+                .main-container {
+                    maxWidth: 1400px;
+                    margin: 0 auto;
+                    padding: 2.5rem;
+                }
+                
+                @media (max-width: 768px) {
+                    .main-container { padding: 1.5rem; }
+                    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+                    .orders-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+                    .header-title { font-size: 1.2rem !important; }
+                    .header-subtitle { font-size: 0.7rem !important; }
+                    .filter-bar { overflow-x: auto; padding-bottom: 5px; }
+                    .section-title { font-size: 1rem; margin: 2rem 0 1rem 0; }
+                    .header-actions { gap: 0.5rem !important; }
+                    .btn-sync span { display: none; }
+                }
             `}</style>
 
             {/* Background Decor */}
@@ -138,7 +261,7 @@ const KitchenView = () => {
             {/* Header */}
             <header style={{
                 background: '#111111',
-                padding: '1.25rem 2.5rem',
+                padding: '1rem 1.5rem',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -148,27 +271,27 @@ const KitchenView = () => {
                 zIndex: 100,
                 backdropFilter: 'blur(10px)'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{
                         background: 'linear-gradient(135deg, #E23744 0%, #B91C1C 100%)',
-                        padding: '10px',
-                        borderRadius: '12px',
+                        padding: '8px',
+                        borderRadius: '10px',
                         boxShadow: '0 8px 20px rgba(226, 55, 68, 0.3)'
                     }}>
-                        <ChefHat color="white" size={24} />
+                        <ChefHat color="white" size={20} />
                     </div>
                     <div>
-                        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }}>Kitchen Terminal</h1>
-                        <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: 0 }}>Active Session: {user?.name || 'In-Charge'}</p>
+                        <h1 className="header-title" style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }}>Kitchen</h1>
+                        <p className="header-subtitle" style={{ fontSize: '0.8rem', color: '#6B7280', margin: 0 }}>Terminal v2.0</p>
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button onClick={fetchOrders} style={{
+                <div className="header-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <button onClick={fetchOrders} className="btn-sync" style={{
                         background: 'rgba(255,255,255,0.05)',
                         border: '1px solid rgba(255,255,255,0.1)',
                         color: 'white',
-                        padding: '0.6rem 1.2rem',
+                        padding: '0.6rem 1rem',
                         borderRadius: '12px',
                         cursor: 'pointer',
                         display: 'flex',
@@ -176,44 +299,44 @@ const KitchenView = () => {
                         gap: '8px',
                         fontWeight: 600
                     }}>
-                        <RefreshCw size={18} /> Sync Orders
+                        <RefreshCw size={18} /> <span>Sync</span>
                     </button>
                     <button onClick={logout} style={{
                         background: 'rgba(239, 68, 68, 0.1)',
                         border: '1px solid rgba(239, 68, 68, 0.2)',
                         color: '#F87171',
-                        padding: '0.6rem 1.2rem',
+                        padding: '0.6rem 1rem',
                         borderRadius: '12px',
                         fontWeight: 700,
                         cursor: 'pointer'
-                    }}>Logout</button>
+                    }}><LogOut size={18} /></button>
                 </div>
             </header>
 
-            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2.5rem' }}>
+            <div className="main-container">
                 {/* Stats Dashboard */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+                <div className="stats-grid">
                     <div className="stat-card">
-                        <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>TOTAL ORDERS</p>
-                        <p style={{ fontSize: '2.5rem', fontWeight: 800, margin: 0, color: 'white' }}>{stats.total}</p>
-                    </div>
-                    <div className="stat-card" style={{ borderTop: '4px solid #F59E0B' }}>
-                        <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>PENDING</p>
-                        <p style={{ fontSize: '2.5rem', fontWeight: 800, margin: 0, color: '#F59E0B' }}>{stats.pending}</p>
+                        <p style={{ fontSize: '0.75rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>INCOMING</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 800, margin: 0, color: '#F59E0B' }}>{stats.pending}</p>
                     </div>
                     <div className="stat-card" style={{ borderTop: '4px solid #E23744' }}>
-                        <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>PREPARING</p>
-                        <p style={{ fontSize: '2.5rem', fontWeight: 800, margin: 0, color: '#E23744' }}>{stats.preparing}</p>
+                        <p style={{ fontSize: '0.75rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>COOKING</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 800, margin: 0, color: '#E23744' }}>{stats.preparing}</p>
                     </div>
                     <div className="stat-card" style={{ borderTop: '4px solid #22C55E' }}>
-                        <p style={{ fontSize: '0.85rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>READY</p>
-                        <p style={{ fontSize: '2.5rem', fontWeight: 800, margin: 0, color: '#22C55E' }}>{stats.ready}</p>
+                        <p style={{ fontSize: '0.75rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>READY</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 800, margin: 0, color: '#22C55E' }}>{stats.ready}</p>
+                    </div>
+                    <div className="stat-card" style={{ borderTop: '4px solid #6B7280' }}>
+                        <p style={{ fontSize: '0.75rem', color: '#6B7280', marginBottom: '0.5rem', fontWeight: 600 }}>DONE</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 800, margin: 0, color: '#9CA3AF' }}>{stats.completed}</p>
                     </div>
                 </div>
 
                 {/* Navigation / Filters */}
-                <div style={{ display: 'flex', gap: '0.85rem', marginBottom: '2.5rem' }}>
-                    {['All', 'Pending', 'Preparing', 'Ready'].map(f => (
+                <div className="filter-bar" style={{ display: 'flex', gap: '0.6rem', marginBottom: '2rem' }}>
+                    {['All', 'Pending', 'Preparing', 'Ready', 'Completed'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
@@ -224,94 +347,47 @@ const KitchenView = () => {
                                 borderColor: filter === f ? '#E23744' : 'rgba(255,255,255,0.1)'
                             }}
                         >
-                            {f} Orders
+                            {f}
                         </button>
                     ))}
                 </div>
 
-                {/* Orders Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '2rem' }}>
-                    {filteredOrders.length === 0 && (
-                        <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '6rem 0' }}>
-                            <div style={{ display: 'inline-flex', padding: '2rem', borderRadius: '50%', background: 'rgba(255,255,255,0.02)', marginBottom: '1.5rem' }}>
-                                <ChefHat size={48} style={{ opacity: 0.2, color: 'white' }} />
-                            </div>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>No active orders</h2>
-                            <p style={{ color: '#6B7280' }}>All clear! Relax or sync to check for new orders.</p>
+                {/* Orders Grid - Grouped if filter is "All" */}
+                {filter === 'All' ? (
+                    <>
+                        {stats.pending > 0 && (
+                            <div className="section-title"><Inbox color="#F59E0B" size={20} /> New Orders ({stats.pending})</div>
+                        )}
+                        <div className="orders-grid">
+                            {orders.filter(o => o.status === 'pending').map(o => <OrderCard key={o._id} order={o} />)}
                         </div>
-                    )}
 
-                    {filteredOrders.map(order => (
-                        <div key={order._id} className="glass-card">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div>
-                                    <p style={{ fontSize: '0.7rem', color: '#6B7280', margin: '0 0 2px 0', letterSpacing: '1px', fontWeight: 700 }}>ORDER TICKET</p>
-                                    <p style={{ fontWeight: 800, fontSize: '1.25rem', color: 'white', margin: 0 }}>#{order._id.slice(-6).toUpperCase()}</p>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <p style={{ fontSize: '0.7rem', color: '#6B7280', margin: '0 0 2px 0', letterSpacing: '1px', fontWeight: 700 }}>PICKUP TIME</p>
-                                    <p style={{ fontWeight: 700, color: '#E23744', margin: 0, fontSize: '1.1rem' }}>
-                                        <Clock size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
-                                        {new Date(order.pickupTime || order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div style={{ marginBottom: '2rem', minHeight: '80px' }}>
-                                {order.items.map((item, i) => (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0.75rem' }}>
-                                        <div style={{
-                                            width: '28px',
-                                            height: '28px',
-                                            borderRadius: '8px',
-                                            background: 'rgba(226, 55, 68, 0.1)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '0.9rem',
-                                            fontWeight: 800,
-                                            color: '#E23744',
-                                            border: '1px solid rgba(226, 55, 68, 0.2)'
-                                        }}>
-                                            {item.quantity}
-                                        </div>
-                                        <span style={{ color: '#E5E7EB', fontWeight: 500, fontSize: '1.05rem' }}>{item.product?.name || 'Item Expired'}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div style={{ marginTop: 'auto' }}>
-                                {order.status === 'pending' && (
-                                    <button
-                                        onClick={() => updateStatus(order._id, 'preparing')}
-                                        className="btn-action"
-                                        style={{ backgroundColor: '#E23744', color: 'white', width: '100%', boxShadow: '0 8px 20px rgba(226, 55, 68, 0.2)' }}
-                                    >
-                                        Accept & Start Preparing
-                                    </button>
-                                )}
-                                {order.status === 'preparing' && (
-                                    <button
-                                        onClick={() => updateStatus(order._id, 'ready')}
-                                        className="btn-action"
-                                        style={{ backgroundColor: '#F59E0B', color: 'white', width: '100%', boxShadow: '0 8px 20px rgba(245, 158, 11, 0.2)' }}
-                                    >
-                                        Mark as Ready to Pickup
-                                    </button>
-                                )}
-                                {order.status === 'ready' && (
-                                    <button
-                                        onClick={() => updateStatus(order._id, 'completed')}
-                                        className="btn-action"
-                                        style={{ backgroundColor: '#22C55E', color: 'white', width: '100%', boxShadow: '0 8px 20px rgba(34, 197, 94, 0.2)' }}
-                                    >
-                                        Handover & Complete
-                                    </button>
-                                )}
-                            </div>
+                        {stats.preparing > 0 && (
+                            <div className="section-title"><Flame color="#E23744" size={20} /> In Preparation ({stats.preparing})</div>
+                        )}
+                        <div className="orders-grid">
+                            {orders.filter(o => o.status === 'preparing').map(o => <OrderCard key={o._id} order={o} />)}
                         </div>
-                    ))}
-                </div>
+
+                        {stats.ready > 0 && (
+                            <div className="section-title"><PackageCheck color="#22C55E" size={20} /> Ready for Pickup ({stats.ready})</div>
+                        )}
+                        <div className="orders-grid">
+                            {orders.filter(o => o.status === 'ready').map(o => <OrderCard key={o._id} order={o} />)}
+                        </div>
+                    </>
+                ) : (
+                    <div className="orders-grid">
+                        {filteredOrders.length === 0 ? (
+                            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem 0' }}>
+                                <ChefHat size={48} style={{ opacity: 0.1, color: 'white', marginBottom: '1rem' }} />
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>No {filter.toLowerCase()} orders</h2>
+                            </div>
+                        ) : (
+                            filteredOrders.map(o => <OrderCard key={o._id} order={o} />)
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

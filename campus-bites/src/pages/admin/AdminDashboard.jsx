@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UtensilsCrossed, BarChart3, LogOut, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, UtensilsCrossed, BarChart3, LogOut, ShieldCheck, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminDashboard = () => {
     const { logout, user } = useAuth();
     const location = useLocation();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const isActive = (path) => location.pathname.includes(path);
 
     return (
         <div style={{
             display: 'flex',
+            flexDirection: 'row',
             minHeight: '100vh',
             backgroundColor: '#0D0D0D',
             color: 'white',
@@ -58,6 +60,7 @@ const AdminDashboard = () => {
                     border: 1px solid rgba(255, 255, 255, 0.08);
                     min-height: calc(100vh - 4rem);
                     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+                    padding: 2rem;
                 }
                 .sidebar {
                     width: 280px;
@@ -67,6 +70,39 @@ const AdminDashboard = () => {
                     flex-direction: column;
                     border-right: 1px solid rgba(255, 255, 255, 0.05);
                     z-index: 100;
+                    transition: transform 0.3s ease;
+                }
+                .mobile-header {
+                    display: none;
+                    background: #111111;
+                    padding: 1rem 1.5rem;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    justify-content: space-between;
+                    align-items: center;
+                    position: sticky;
+                    top: 0;
+                    z-index: 101;
+                }
+                
+                @media (max-width: 1024px) {
+                    .sidebar {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        height: 100vh;
+                        transform: translateX(${isMobileMenuOpen ? '0' : '-100%'});
+                        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+                    }
+                    .mobile-header {
+                        display: flex;
+                    }
+                    .main-layout {
+                        flex-direction: column !important;
+                    }
+                    .glass-content {
+                        padding: 1.25rem;
+                        border-radius: 16px;
+                    }
                 }
             `}</style>
 
@@ -74,28 +110,54 @@ const AdminDashboard = () => {
             <div className="floating-emoji" style={{ top: '10%', right: '5%' }}>🍕</div>
             <div className="floating-emoji" style={{ bottom: '15%', left: '20%', animationDelay: '2s' }}>🍜</div>
 
+            {/* Sidebar Overlay */}
+            {isMobileMenuOpen && (
+                <div
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)',
+                        zIndex: 99
+                    }}
+                />
+            )}
+
             {/* Sidebar */}
             <aside className="sidebar">
-                <div style={{ marginBottom: '3rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                        <div style={{
-                            background: '#E23744',
-                            padding: '8px',
-                            borderRadius: '12px',
-                            boxShadow: '0 8px 20px rgba(226, 55, 68, 0.3)'
-                        }}>
-                            <ShieldCheck color="white" size={24} />
+                <div style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                            <div style={{
+                                background: '#E23744',
+                                padding: '8px',
+                                borderRadius: '12px',
+                                boxShadow: '0 8px 20px rgba(226, 55, 68, 0.3)'
+                            }}>
+                                <ShieldCheck color="white" size={24} />
+                            </div>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>Admin</h2>
                         </div>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>Admin</h2>
+                        <p style={{ color: '#6B7280', fontSize: '0.85rem', margin: 0 }}>Terminal v2.0</p>
                     </div>
-                    <p style={{ color: '#6B7280', fontSize: '0.85rem', margin: 0 }}>Terminal Dashboard v2.0</p>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        style={{ display: 'none', background: 'transparent', border: 'none', color: 'white' }}
+                        className="mobile-close-btn"
+                    >
+                        <X size={24} />
+                    </button>
+                    <style>{`
+                        @media (max-width: 1024px) {
+                            .mobile-close-btn { display: block !important; }
+                        }
+                    `}</style>
                 </div>
 
                 <nav style={{ flex: 1 }}>
-                    <Link to="/admin/menu" className={`nav-link ${isActive('/admin/menu') ? 'active' : ''}`}>
+                    <Link to="/admin/menu" onClick={() => setIsMobileMenuOpen(false)} className={`nav-link ${isActive('/admin/menu') ? 'active' : ''}`}>
                         <UtensilsCrossed size={20} style={{ marginRight: '1rem' }} /> Manage Menu
                     </Link>
-                    <Link to="/admin/analytics" className={`nav-link ${isActive('/admin/analytics') ? 'active' : ''}`}>
+                    <Link to="/admin/analytics" onClick={() => setIsMobileMenuOpen(false)} className={`nav-link ${isActive('/admin/analytics') ? 'active' : ''}`}>
                         <BarChart3 size={20} style={{ marginRight: '1rem' }} /> Analytics
                     </Link>
                 </nav>
@@ -106,7 +168,7 @@ const AdminDashboard = () => {
                             <span style={{ fontWeight: 700, color: '#E23744' }}>{user?.name?.[0] || 'A'}</span>
                         </div>
                         <div style={{ overflow: 'hidden' }}>
-                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || 'Administrator'}</p>
+                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || 'Admin'}</p>
                             <p style={{ margin: 0, fontSize: '0.75rem', color: '#6B7280' }}>Master Access</p>
                         </div>
                     </div>
@@ -119,22 +181,40 @@ const AdminDashboard = () => {
                             color: '#F87171', cursor: 'pointer', fontSize: '0.9rem',
                             fontWeight: 600, transition: 'all 0.3s ease'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(248, 113, 113, 0.05)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
                         <LogOut size={18} style={{ marginRight: '0.8rem' }} /> Logout System
                     </button>
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
-                <div className="glass-content" style={{ padding: '2rem' }}>
-                    <Outlet />
-                </div>
-            </main>
+            {/* Main Wrapper */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }} className="main-layout">
+                {/* Mobile Header */}
+                <header className="mobile-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ background: '#E23744', padding: '6px', borderRadius: '8px' }}>
+                            <ShieldCheck color="white" size={18} />
+                        </div>
+                        <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Campus Admin</h2>
+                    </div>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        style={{ background: 'transparent', border: 'none', color: 'white' }}
+                    >
+                        <Menu size={24} />
+                    </button>
+                </header>
+
+                {/* Main Content */}
+                <main style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>
+                    <div className="glass-content">
+                        <Outlet />
+                    </div>
+                </main>
+            </div>
         </div>
     );
 };
 
 export default AdminDashboard;
+
