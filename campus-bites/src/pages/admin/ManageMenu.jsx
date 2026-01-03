@@ -12,7 +12,7 @@ const ManageMenu = () => {
 
     // Form State
     const [formData, setFormData] = useState({
-        name: '', price: '', category: 'Snacks', description: '', image: '', isAvailable: true
+        name: '', price: '', category: 'Snacks', description: '', image: '', isAvailable: true, isVeg: true
     });
 
     const fetchProducts = async () => {
@@ -35,13 +35,19 @@ const ManageMenu = () => {
             setFormData(product);
         } else {
             setEditingProduct(null);
-            setFormData({ name: '', price: '', category: 'Snacks', description: '', image: '', isAvailable: true });
+            setFormData({ name: '', price: '', category: 'Snacks', description: '', image: '', isAvailable: true, isVeg: true });
         }
         setIsModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this item?')) return;
+
+        if (!user?.id) {
+            alert('Authentication error. Please log in again.');
+            return;
+        }
+
         try {
             const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: 'DELETE',
@@ -58,6 +64,12 @@ const ManageMenu = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!user?.id) {
+            alert('Authentication error. Please log in again.');
+            return;
+        }
+
         setLoading(true);
         const url = editingProduct
             ? `${API_URL}/api/products/${editingProduct._id}`
@@ -313,6 +325,85 @@ const ManageMenu = () => {
                             <div style={{ marginBottom: '1rem' }}>
                                 <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '6px', textTransform: 'uppercase' }}>Image URL</label>
                                 <input className="input-field-dark" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} placeholder="https://..." />
+                            </div>
+
+                            {/* Veg/Non-Veg Selection */}
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6B7280', marginBottom: '10px', textTransform: 'uppercase' }}>Food Type</label>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    {/* Veg Option */}
+                                    <div
+                                        onClick={() => setFormData({ ...formData, isVeg: true })}
+                                        style={{
+                                            flex: 1,
+                                            padding: '1rem',
+                                            borderRadius: '12px',
+                                            border: formData.isVeg ? '2px solid #22C55E' : '1px solid rgba(255,255,255,0.1)',
+                                            background: formData.isVeg ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.03)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px'
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            border: '2px solid #22C55E',
+                                            borderRadius: '4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'white'
+                                        }}>
+                                            <div style={{
+                                                width: '10px',
+                                                height: '10px',
+                                                borderRadius: '50%',
+                                                background: '#22C55E'
+                                            }} />
+                                        </div>
+                                        <span style={{ fontWeight: 600, color: formData.isVeg ? '#22C55E' : '#9CA3AF' }}>Vegetarian</span>
+                                    </div>
+
+                                    {/* Non-Veg Option */}
+                                    <div
+                                        onClick={() => setFormData({ ...formData, isVeg: false })}
+                                        style={{
+                                            flex: 1,
+                                            padding: '1rem',
+                                            borderRadius: '12px',
+                                            border: !formData.isVeg ? '2px solid #EF4444' : '1px solid rgba(255,255,255,0.1)',
+                                            background: !formData.isVeg ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.03)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '10px'
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            border: '2px solid #EF4444',
+                                            borderRadius: '4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'white'
+                                        }}>
+                                            <div style={{
+                                                width: 0,
+                                                height: 0,
+                                                borderLeft: '5px solid transparent',
+                                                borderRight: '5px solid transparent',
+                                                borderBottom: '8px solid #EF4444'
+                                            }} />
+                                        </div>
+                                        <span style={{ fontWeight: 600, color: !formData.isVeg ? '#EF4444' : '#9CA3AF' }}>Non-Vegetarian</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>

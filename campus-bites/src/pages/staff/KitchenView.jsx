@@ -10,6 +10,10 @@ const KitchenView = () => {
     const { logout, user } = useAuth();
 
     const fetchOrders = async () => {
+        if (!user?.id) {
+            return;
+        }
+
         try {
             const res = await fetch(`${API_URL}/api/orders/staff/active`, {
                 headers: { 'x-user-id': user.id }
@@ -24,12 +28,19 @@ const KitchenView = () => {
     };
 
     useEffect(() => {
-        fetchOrders();
-        const interval = setInterval(fetchOrders, 10000); // Poll every 10s
-        return () => clearInterval(interval);
-    }, []);
+        if (user?.id) {
+            fetchOrders();
+            const interval = setInterval(fetchOrders, 10000); // Poll every 10s
+            return () => clearInterval(interval);
+        }
+    }, [user?.id]);
 
     const updateStatus = async (orderId, newStatus) => {
+        if (!user?.id) {
+            alert('Authentication error. Please log in again.');
+            return;
+        }
+
         try {
             await fetch(`${API_URL}/api/orders/${orderId}/status`, {
                 method: 'PUT',
@@ -85,6 +96,36 @@ const KitchenView = () => {
                 <p style={{ fontSize: '0.75rem', color: '#9CA3AF', marginBottom: '10px', textTransform: 'uppercase', fontWeight: 700 }}>Customer: {order.user?.name || 'Guest'}</p>
                 {order.items.map((item, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '0.75rem' }}>
+                        {/* Veg/Non-Veg Badge */}
+                        <div style={{
+                            width: '18px',
+                            height: '18px',
+                            border: `2px solid ${item.product?.isVeg !== false ? '#22C55E' : '#EF4444'}`,
+                            borderRadius: '3px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: 'white',
+                            flexShrink: 0
+                        }}>
+                            {item.product?.isVeg !== false ? (
+                                <div style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: '#22C55E'
+                                }} />
+                            ) : (
+                                <div style={{
+                                    width: 0,
+                                    height: 0,
+                                    borderLeft: '4px solid transparent',
+                                    borderRight: '4px solid transparent',
+                                    borderBottom: '7px solid #EF4444'
+                                }} />
+                            )}
+                        </div>
+
                         <div style={{
                             width: '28px',
                             height: '28px',

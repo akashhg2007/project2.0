@@ -23,6 +23,13 @@ const Cart = () => {
             alert('Please select a pickup time');
             return;
         }
+
+        if (!user?.id) {
+            alert('Please log in to place an order');
+            navigate('/');
+            return;
+        }
+
         setLoading(true);
         try {
             const orderData = {
@@ -126,13 +133,75 @@ const Cart = () => {
                         gap: '1rem'
                     }}>
                         {/* Tiny Image Thumbnail */}
-                        <div style={{ width: '60px', height: '60px', borderRadius: '12px', overflow: 'hidden' }}>
+                        <div style={{ width: '60px', height: '60px', borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
                             <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            {/* Veg/Non-Veg Badge on Image */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '4px',
+                                right: '4px',
+                                width: '14px',
+                                height: '14px',
+                                border: `1.5px solid ${item.isVeg !== false ? '#22C55E' : '#EF4444'}`,
+                                borderRadius: '2px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: 'white'
+                            }}>
+                                {item.isVeg !== false ? (
+                                    <div style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: '#22C55E'
+                                    }} />
+                                ) : (
+                                    <div style={{
+                                        width: 0,
+                                        height: 0,
+                                        borderLeft: '3px solid transparent',
+                                        borderRight: '3px solid transparent',
+                                        borderBottom: '5px solid #EF4444'
+                                    }} />
+                                )}
+                            </div>
                         </div>
 
                         <div style={{ flex: 1 }}>
-                            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '4px' }}>{item.name}</h3>
-                            <p style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>₹{item.price}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>{item.name}</h3>
+                                {/* Veg/Non-Veg Badge next to name */}
+                                <div style={{
+                                    width: '14px',
+                                    height: '14px',
+                                    border: `1.5px solid ${item.isVeg !== false ? '#22C55E' : '#EF4444'}`,
+                                    borderRadius: '2px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'white',
+                                    flexShrink: 0
+                                }}>
+                                    {item.isVeg !== false ? (
+                                        <div style={{
+                                            width: '6px',
+                                            height: '6px',
+                                            borderRadius: '50%',
+                                            background: '#22C55E'
+                                        }} />
+                                    ) : (
+                                        <div style={{
+                                            width: 0,
+                                            height: 0,
+                                            borderLeft: '3px solid transparent',
+                                            borderRight: '3px solid transparent',
+                                            borderBottom: '5px solid #EF4444'
+                                        }} />
+                                    )}
+                                </div>
+                            </div>
+                            <p style={{ color: '#9CA3AF', fontSize: '0.9rem', margin: 0 }}>₹{item.price}</p>
                         </div>
 
                         {/* Quantity Controls */}

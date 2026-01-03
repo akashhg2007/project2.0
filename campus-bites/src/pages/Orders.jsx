@@ -18,6 +18,12 @@ const Orders = () => {
     const navigate = useNavigate();
 
     const fetchOrders = async () => {
+        if (!user?.id) {
+            setLoading(false);
+            setRefreshing(false);
+            return;
+        }
+
         try {
             const res = await fetch(`${API_URL}/api/orders/mine`, {
                 headers: { 'x-user-id': user.id }
@@ -36,8 +42,10 @@ const Orders = () => {
     };
 
     useEffect(() => {
-        fetchOrders();
-    }, [user.id]);
+        if (user?.id) {
+            fetchOrders();
+        }
+    }, [user?.id]);
 
     const handleRefresh = () => {
         setRefreshing(true);
@@ -370,14 +378,46 @@ const Orders = () => {
                                         <div key={i} style={{
                                             display: 'flex',
                                             justifyContent: 'space-between',
+                                            alignItems: 'center',
                                             fontSize: '0.9rem',
                                             marginBottom: i < order.items.length - 1 ? '0.5rem' : 0,
                                             color: '#D1D5DB'
                                         }}>
-                                            <span>
-                                                <span style={{ color: '#9CA3AF', marginRight: '8px' }}>{item.quantity}x</span>
-                                                {item.product?.name || 'Item'}
-                                            </span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                {/* Veg/Non-Veg Badge */}
+                                                <div style={{
+                                                    width: '14px',
+                                                    height: '14px',
+                                                    border: `1.5px solid ${item.product?.isVeg !== false ? '#22C55E' : '#EF4444'}`,
+                                                    borderRadius: '2px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    background: 'white',
+                                                    flexShrink: 0
+                                                }}>
+                                                    {item.product?.isVeg !== false ? (
+                                                        <div style={{
+                                                            width: '6px',
+                                                            height: '6px',
+                                                            borderRadius: '50%',
+                                                            background: '#22C55E'
+                                                        }} />
+                                                    ) : (
+                                                        <div style={{
+                                                            width: 0,
+                                                            height: 0,
+                                                            borderLeft: '3px solid transparent',
+                                                            borderRight: '3px solid transparent',
+                                                            borderBottom: '5px solid #EF4444'
+                                                        }} />
+                                                    )}
+                                                </div>
+                                                <span>
+                                                    <span style={{ color: '#9CA3AF', marginRight: '8px' }}>{item.quantity}x</span>
+                                                    {item.product?.name || 'Item'}
+                                                </span>
+                                            </div>
                                             <span>₹{(item.price || 0) * item.quantity}</span>
                                         </div>
                                     ))}
