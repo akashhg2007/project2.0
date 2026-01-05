@@ -354,7 +354,9 @@ const Login = () => {
                                     color: '#9CA3AF',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    transition: 'color 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    zIndex: 10,
+                                    userSelect: 'none'
                                 }}
                                 onMouseEnter={(e) => e.currentTarget.style.color = '#E23744'}
                                 onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
