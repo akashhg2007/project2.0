@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { UtensilsCrossed, Mail, Lock, ArrowRight, Sparkles, ChefHat } from 'lucide-react'
+import { UtensilsCrossed, Mail, Lock, ArrowRight, Sparkles, ChefHat, Eye, EyeOff } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
@@ -14,6 +14,7 @@ const Login = () => {
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -121,7 +122,7 @@ const Login = () => {
                 .input-modern {
                     width: 100%;
                     box-sizing: border-box;
-                    padding: 1rem 1rem 1rem 3rem;
+                    padding: 1rem 3rem 1rem 3rem;
                     border: 1px solid rgba(255, 255, 255, 0.1);
                     border-radius: 1rem;
                     font-size: 1rem;
@@ -332,7 +333,7 @@ const Login = () => {
 
                         <div style={{ marginBottom: '2rem', position: 'relative' }}>
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 className="input-modern"
                                 placeholder="Password"
                                 value={password}
@@ -341,6 +342,24 @@ const Login = () => {
                             />
                             <div className="icon-wrapper">
                                 <Lock size={20} />
+                            </div>
+                            <div
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '1rem',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    cursor: 'pointer',
+                                    color: '#9CA3AF',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    transition: 'color 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.color = '#E23744'}
+                                onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </div>
                         </div>
 
