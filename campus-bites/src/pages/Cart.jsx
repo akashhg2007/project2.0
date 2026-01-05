@@ -505,16 +505,18 @@ const Cart = () => {
                             );
                         })()}
 
-                        {/* Selected Time Display */}
+                    </div>
+
+                    {/* Selected Time Display - Moved Below Clock */}
+                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                         <div style={{
-                            position: 'absolute',
-                            bottom: '15%',
+                            display: 'inline-block',
                             fontSize: '1.25rem',
                             fontWeight: 800,
                             color: '#FFFFFF',
                             letterSpacing: '0.5px',
                             background: 'rgba(226, 55, 68, 0.95)',
-                            padding: '6px 16px',
+                            padding: '8px 24px',
                             borderRadius: '16px',
                             boxShadow: '0 8px 20px rgba(226, 55, 68, 0.4)',
                             transition: 'all 0.3s ease',
