@@ -302,6 +302,25 @@ const Cart = () => {
                         justify-content: space-between;
                         align-items: center;
                     }
+                    .clock-face {
+                        background: rgba(255, 255, 255, 0.03);
+                        backdrop-filter: blur(15px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        box-shadow: 
+                            inset 0 0 40px rgba(0, 0, 0, 0.4),
+                            0 15px 35px rgba(0, 0, 0, 0.5);
+                    }
+                    .clock-number {
+                        transition: all 0.3s ease;
+                        font-family: 'Inter', sans-serif;
+                    }
+                    .clock-hand-shadow {
+                        filter: drop-shadow(0 0 8px rgba(226, 55, 68, 0.6));
+                    }
+                    @keyframes sweep {
+                        from { transform: translateX(-50%) rotate(var(--start-deg)); }
+                        to { transform: translateX(-50%) rotate(var(--end-deg)); }
+                    }
                 `}</style>
                 <div className="donation-card" style={{
                     borderColor: isDonationChecked ? 'rgba(226, 55, 68, 0.6)' : 'rgba(255, 255, 255, 0.1)',
@@ -349,41 +368,50 @@ const Cart = () => {
                     <Clock size={16} color="#E23744" /> Select Pickup Time
                 </h3>
 
-                <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '24px' }}>
+                <div className="glass-panel" style={{ padding: '2rem 1.5rem', borderRadius: '32px' }}>
                     {/* Visual Clock Display */}
-                    <div style={{
+                    <div className="clock-face" style={{
                         position: 'relative',
-                        width: '200px',
-                        height: '200px',
-                        margin: '0 auto 1.5rem',
+                        width: '220px',
+                        height: '220px',
+                        margin: '0 auto 2rem',
                         borderRadius: '50%',
-                        background: 'linear-gradient(135deg, rgba(226, 55, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
-                        border: '3px solid rgba(226, 55, 68, 0.3)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}>
+                        {/* Clock Glow */}
+                        <div style={{
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: '50%',
+                            background: 'radial-gradient(circle at center, rgba(226, 55, 68, 0.08) 0%, transparent 70%)',
+                            pointerEvents: 'none'
+                        }} />
                         {/* Clock Face Numbers */}
                         {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num, idx) => {
                             const angle = (idx * 30 - 90) * (Math.PI / 180);
-                            const radius = 75;
+                            const radius = 85;
                             const x = Math.cos(angle) * radius;
                             const y = Math.sin(angle) * radius;
                             return (
                                 <div
                                     key={num}
+                                    className="clock-number"
                                     style={{
                                         position: 'absolute',
-                                        left: `calc(50% + ${x}px - 12px)`,
-                                        top: `calc(50% + ${y}px - 12px)`,
-                                        width: '24px',
-                                        height: '24px',
+                                        left: `calc(50% + ${x}px - 14px)`,
+                                        top: `calc(50% + ${y}px - 14px)`,
+                                        width: '28px',
+                                        height: '28px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        fontSize: '0.85rem',
-                                        fontWeight: 600,
-                                        color: '#9CA3AF'
+                                        fontSize: '0.9rem',
+                                        fontWeight: 700,
+                                        color: num % 3 === 0 ? '#FFFFFF' : '#6B7280',
+                                        opacity: num % 3 === 0 ? 1 : 0.6
                                     }}
                                 >
                                     {num}
@@ -393,13 +421,14 @@ const Cart = () => {
 
                         {/* Center Dot */}
                         <div style={{
-                            width: '12px',
-                            height: '12px',
+                            width: '16px',
+                            height: '16px',
                             borderRadius: '50%',
-                            background: '#E23744',
+                            background: '#FFFFFF',
                             position: 'absolute',
                             zIndex: 10,
-                            boxShadow: '0 0 10px rgba(226, 55, 68, 0.5)'
+                            boxShadow: '0 0 20px rgba(255, 255, 255, 0.4)',
+                            border: '4px solid #E23744'
                         }} />
 
                         {/* Clock Hands */}
@@ -441,32 +470,36 @@ const Cart = () => {
                             return (
                                 <>
                                     {/* Hour Hand */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        bottom: '50%',
-                                        left: '50%',
-                                        width: '4px',
-                                        height: '50px',
-                                        background: '#E23744',
-                                        borderRadius: '4px',
-                                        transformOrigin: 'bottom center',
-                                        transform: `translateX(-50%) rotate(${hourDeg}deg)`,
-                                        transition: 'transform 0.5s cubic-bezier(0.4, 2.08, 0.55, 0.44)',
-                                        zIndex: 5
-                                    }} />
+                                    <div
+                                        className="clock-hand-shadow"
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: '50%',
+                                            left: '50%',
+                                            width: '6px',
+                                            height: '55px',
+                                            background: 'linear-gradient(to top, #E23744, #EF4444)',
+                                            borderRadius: '6px 6px 4px 4px',
+                                            transformOrigin: 'bottom center',
+                                            transform: `translateX(-50%) rotate(${hourDeg}deg)`,
+                                            transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                            zIndex: 5
+                                        }}
+                                    />
                                     {/* Minute Hand */}
                                     <div style={{
                                         position: 'absolute',
                                         bottom: '50%',
                                         left: '50%',
-                                        width: '2px',
-                                        height: '70px',
-                                        background: 'white',
+                                        width: '3px',
+                                        height: '85px',
+                                        background: 'rgba(255, 255, 255, 0.9)',
                                         borderRadius: '4px',
                                         transformOrigin: 'bottom center',
                                         transform: `translateX(-50%) rotate(${minuteDeg}deg)`,
-                                        transition: 'transform 0.5s cubic-bezier(0.4, 2.08, 0.55, 0.44)',
-                                        zIndex: 4
+                                        transition: 'transform 1s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                        zIndex: 4,
+                                        boxShadow: '0 0 10px rgba(255,255,255,0.2)'
                                     }} />
                                 </>
                             );
@@ -475,14 +508,18 @@ const Cart = () => {
                         {/* Selected Time Display */}
                         <div style={{
                             position: 'absolute',
-                            bottom: '20%',
-                            fontSize: '1.2rem',
-                            fontWeight: 700,
-                            color: '#E23744',
-                            textShadow: '0 2px 8px rgba(226, 55, 68, 0.3)',
-                            background: 'rgba(0,0,0,0.4)',
-                            padding: '4px 12px',
-                            borderRadius: '12px'
+                            bottom: '15%',
+                            fontSize: '1.25rem',
+                            fontWeight: 800,
+                            color: '#FFFFFF',
+                            letterSpacing: '0.5px',
+                            background: 'rgba(226, 55, 68, 0.95)',
+                            padding: '6px 16px',
+                            borderRadius: '16px',
+                            boxShadow: '0 8px 20px rgba(226, 55, 68, 0.4)',
+                            transition: 'all 0.3s ease',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            zIndex: 10
                         }}>
                             {pickupTime || 'Select Time'}
                         </div>
