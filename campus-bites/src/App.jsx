@@ -1,4 +1,5 @@
 import React from 'react'
+import SplashScreen from './components/SplashScreen'
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
@@ -38,6 +39,13 @@ const ProtectedRoute = ({ children, roles }) => {
 };
 
 function App() {
+    /* Splash Screen State */
+    const [showSplash, setShowSplash] = React.useState(true);
+
+    if (showSplash) {
+        return <SplashScreen onComplete={() => setShowSplash(false)} />;
+    }
+
     return (
         <AuthProvider>
             <CartProvider>

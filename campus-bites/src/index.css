@@ -1,4 +1,6 @@
 /* Campus Bites - 2026 Redesign (v2.2) */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;900&display=swap');
+
 :root {
   /* 2026 Palette */
   --bg-deep: #0D0D0D;
@@ -14,7 +16,7 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-deep);
   background-image:
     linear-gradient(rgba(13, 13, 13, 0.94), rgba(13, 13, 13, 0.94)),

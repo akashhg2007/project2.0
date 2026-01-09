@@ -137,8 +137,24 @@ const Login = () => {
                     100% { background-position: 1000px 0; }
                 }
                 @keyframes slideIn {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
+                    from { 
+                        opacity: 0; 
+                        transform: translateY(50px); 
+                    }
+                    to { 
+                        opacity: 1; 
+                        transform: translateY(0); 
+                    }
+                }
+                @keyframes slideInStagger {
+                    from { 
+                        opacity: 0; 
+                        transform: translateY(30px); 
+                    }
+                    to { 
+                        opacity: 1; 
+                        transform: translateY(0); 
+                    }
                 }
                 .floating-emoji {
                     position: absolute;
@@ -152,7 +168,7 @@ const Login = () => {
                     border-radius: 1.5rem;
                     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
                     border: 1px solid rgba(255, 255, 255, 0.08);
-                    animation: slideIn 0.5s ease-out;
+                    animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
                 }
                 .input-modern {
                     width: 100%;
@@ -256,6 +272,17 @@ const Login = () => {
                     filter: blur(40px);
                     animation: pulse 4s ease-in-out infinite;
                 }
+                .animate-item {
+                    animation: slideInStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+                }
+                .delay-1 { animation-delay: 0.1s; }
+                .delay-2 { animation-delay: 0.2s; }
+                .delay-3 { animation-delay: 0.3s; }
+                .delay-4 { animation-delay: 0.4s; }
+                .delay-5 { animation-delay: 0.5s; }
+                .delay-6 { animation-delay: 0.6s; }
+                .delay-7 { animation-delay: 0.7s; }
+                .delay-8 { animation-delay: 0.8s; }
             `}</style>
 
             {/* Glowing Background Circles */}
@@ -279,7 +306,7 @@ const Login = () => {
                 {/* Logo & Title */}
                 <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     {/* Animated Logo */}
-                    <div style={{
+                    <div className="animate-item delay-1" style={{
                         width: '80px',
                         height: '80px',
                         background: 'linear-gradient(135deg, #E23744 0%, #DC2626 100%)',
@@ -310,7 +337,7 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <h1 className="gradient-text" style={{
+                    <h1 className="gradient-text animate-item delay-2" style={{
                         fontSize: '2.5rem',
                         fontWeight: 800,
                         marginBottom: '0.5rem',
@@ -318,12 +345,12 @@ const Login = () => {
                     }}>
                         Campus Bites
                     </h1>
-                    <p style={{ color: '#9CA3AF', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+                    <p className="animate-item delay-3" style={{ color: '#9CA3AF', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
                         Your favorite canteen, now online
                     </p>
 
                     {/* Feature Badges */}
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <div className="animate-item delay-4" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <div className="feature-badge">
                             <ChefHat size={14} />
                             Fresh Food
@@ -352,7 +379,7 @@ const Login = () => {
 
                 {!showOtp ? (
                     <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
+                        <div className="animate-item delay-5" style={{ marginBottom: '1.25rem', position: 'relative' }}>
                             <input
                                 type="email"
                                 className="input-modern"
@@ -366,7 +393,7 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: '2rem', position: 'relative' }}>
+                        <div className="animate-item delay-6" style={{ marginBottom: '2rem', position: 'relative' }}>
                             <input
                                 type={showPassword ? "text" : "password"}
                                 className="input-modern"
@@ -400,13 +427,13 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
+                        <div className="animate-item delay-7" style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
                             <a href="/forgot-password" style={{ color: '#E23744', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 500 }}>
                                 Forgot Password?
                             </a>
                         </div>
 
-                        <button type="submit" className="btn-modern" disabled={loading}>
+                        <button type="submit" className="btn-modern animate-item delay-8" disabled={loading}>
                             {loading ? (
                                 <>
                                     <div style={{
