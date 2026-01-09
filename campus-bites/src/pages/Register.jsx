@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { User, Mail, Lock, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -10,13 +10,22 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
 
-    // Wake up the server as soon as the page loads to avoid Render's cold start delay
-    React.useEffect(() => {
+    // Wake up the server as soon as the page loads
+    useEffect(() => {
         fetch(`${API_URL}/`).catch(() => { });
     }, []);
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user) {
+            if (user.role === 'admin') navigate('/admin/menu');
+            else if (user.role === 'staff') navigate('/staff/kitchen');
+            else navigate('/dashboard/menu');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

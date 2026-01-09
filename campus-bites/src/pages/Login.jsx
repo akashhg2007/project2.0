@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { UtensilsCrossed, Mail, Lock, ArrowRight, Sparkles, ChefHat, Eye, EyeOff } from 'lucide-react'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
@@ -16,8 +16,16 @@ const Login = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) {
+            if (user.role === 'admin') navigate('/admin/menu');
+            else if (user.role === 'staff') navigate('/staff/kitchen');
+            else navigate('/dashboard/menu');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
