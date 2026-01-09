@@ -59,6 +59,7 @@ const Register = () => {
 
 
     const googleLogin = useGoogleLogin({
+        flow: 'implicit',
         onSuccess: async (tokenResponse) => {
             setLoading(true);
             setError('');
