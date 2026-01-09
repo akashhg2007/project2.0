@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { User, Mail, Lock, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useGoogleLogin } from '@react-oauth/google'
 import API_URL from '../apiConfig';
 
 const Register = () => {
@@ -57,9 +58,35 @@ const Register = () => {
     };
 
 
-    const handleGoogleSuccess = () => {
-        setError('Google Login will be live soon! Please use the form for now.');
-    };
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            setLoading(true);
+            setError('');
+            try {
+                const res = await fetch(`${API_URL}/api/auth/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accessToken: tokenResponse.access_token })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    login(data.user);
+                    if (data.user.role === 'admin') navigate('/admin/menu');
+                    else if (data.user.role === 'staff') navigate('/staff/kitchen');
+                    else navigate('/dashboard/menu');
+                } else {
+                    setError(data.message || 'Google Signup Failed');
+                }
+            } catch (err) {
+                setError('Server connection error during Google Signup');
+            } finally {
+                setLoading(false);
+            }
+        },
+        onError: () => setError('Google Signup Failed'),
+    });
 
     return (
         <div style={{
@@ -291,7 +318,7 @@ const Register = () => {
                 {/* Google Button (Disabled) */}
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                     <button
-                        onClick={handleGoogleSuccess}
+                        onClick={() => googleLogin()}
                         style={{
                             width: '100%',
                             padding: '0.75rem',

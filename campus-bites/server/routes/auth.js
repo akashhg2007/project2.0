@@ -152,16 +152,37 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // Google Login
+// Google Login
 router.post('/google', async (req, res) => {
     try {
-        const { credential } = req.body;
-        const ticket = await client.verifyIdToken({
-            idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID
-        });
+        const { credential, accessToken } = req.body;
+        let email, name;
 
-        const payload = ticket.getPayload();
-        const { email, name, picture, sub: googleId } = payload;
+        if (credential) {
+            // ID Token (Standard Google Button)
+            const ticket = await client.verifyIdToken({
+                idToken: credential,
+                audience: process.env.GOOGLE_CLIENT_ID
+            });
+            const payload = ticket.getPayload();
+            email = payload.email;
+            name = payload.name;
+        } else if (accessToken) {
+            // Access Token (Custom Button via useGoogleLogin)
+            const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+
+            if (!response.ok) {
+                return res.status(400).json({ message: 'Invalid Google Token' });
+            }
+
+            const userInfo = await response.json();
+            email = userInfo.email;
+            name = userInfo.name;
+        } else {
+            return res.status(400).json({ message: 'No credential provided' });
+        }
 
         let user = await User.findOne({ email });
 
