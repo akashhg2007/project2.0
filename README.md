@@ -107,13 +107,6 @@ npm run dev
 
 ---
 
-## 📸 Preview
-
-*(Add your screenshots here)*
-> **Tip:** You can use the `public/` directory images to showcase the UI.
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:
